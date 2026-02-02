@@ -82,14 +82,19 @@ class TestSchemaMapper:
     def test_detect_drift_no_drift(self, sample_ontology, mock_database_schema):
         """Test drift detection when no drift exists."""
         mapper = SchemaMapper(sample_ontology, "test_db")
-        binding = mapper.create_binding("Shipment", "dbo.shipments")
-        binding.property_mappings["WarehouseLocation"] = "warehouse_location"
-        
+        binding = mapper.create_binding(
+            "Shipment", "dbo.shipments",
+            property_mappings={
+                "ShipmentID": "shipment_id",
+                "Temperature": "temperature",
+            }
+        )
+
         # Schema matches expectations
-        current_schema = {"warehouse_location": "String"}
-        
+        current_schema = {"shipment_id": "String", "temperature": "Decimal"}
+
         drift = mapper.detect_drift(binding, current_schema)
-        
+
         assert drift.severity == "INFO" or len(drift.missing_columns) == 0
         assert len(drift.missing_columns) == 0
     
@@ -179,15 +184,22 @@ class TestSchemaMapper:
     def test_detect_drift_new_columns(self, sample_ontology):
         """Test detection of new columns."""
         mapper = SchemaMapper(sample_ontology, "test_db")
-        binding = mapper.create_binding("Shipment", "dbo.shipments")
-        
+        binding = mapper.create_binding(
+            "Shipment", "dbo.shipments",
+            property_mappings={
+                "ShipmentID": "shipment_id",
+                "Temperature": "temperature",
+            }
+        )
+
         actual_schema = {
-            "shipment_id": "GUID",
+            "shipment_id": "String",
+            "temperature": "Decimal",
             "new_column": "String"  # New column added
         }
-        
+
         drift = mapper.detect_drift(binding, actual_schema)
-        
+
         assert "new_column" in drift.new_columns
         assert drift.severity == "INFO" or drift.severity == "WARNING"
     

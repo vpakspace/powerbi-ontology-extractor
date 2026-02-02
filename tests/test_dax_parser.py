@@ -40,7 +40,7 @@ class TestDAXParser:
         rule = parsed.business_rules[0]
         assert "RiskScore" in rule.condition
         assert "80" in rule.condition
-        assert rule.entity == "Customer" or rule.entity == ""
+        assert rule.entity == "Customers" or rule.entity == ""
     
     def test_parse_switch_statement(self):
         """Test parsing SWITCH statement into multiple business rules."""

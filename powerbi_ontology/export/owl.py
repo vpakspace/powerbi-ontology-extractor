@@ -34,7 +34,8 @@ class OWLExporter:
         self.graph = Graph()
         
         # Create namespace for this ontology
-        self.base_uri = f"http://example.com/ontologies/{ontology.name}#"
+        safe_name = ontology.name.replace(" ", "_")
+        self.base_uri = f"http://example.com/ontologies/{safe_name}#"
         self.ont = Namespace(self.base_uri)
 
     def export(self, format: str = "xml") -> str:
