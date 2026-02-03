@@ -138,13 +138,21 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 ---
 
-### 🔄 В работе: Интеграция с OntoGuard
+#### 6. ✅ E2E интеграция с OntoGuard
+- **Статус**: Завершено
+- **Файл**: `tests/test_e2e/test_contract_ontoguard_integration.py`
+- **Реализовано**:
+  - [x] E2E pipeline: Ontology → ContractBuilder → OWL → OntoGuard validation
+  - [x] Загрузка contract OWL в OntoGuard OntologyValidator
+  - [x] Валидация read/write/execute actions через OntoGuard
+  - [x] Проверка role-based access (SalesAgent, Admin, Viewer)
+  - [x] Тестирование check_permissions и get_allowed_actions API
+- **Тесты**: 16 E2E тестов passed
+- **Всего тестов проекта**: 231 passed, coverage 83%
 
-#### 6. Подключить к validate_action_tool в OntoGuard
-- **Статус**: Не начато
-- **TODO**:
-  - [ ] Интеграция ContractToOWLConverter с OntoGuard MCP Server
-  - [ ] Тестирование E2E: .pbix → contract → OntoGuard validation
+---
+
+### 📋 Новые задачи (из roadmap)
 
 #### 7. Улучшить OWL Exporter
 - **Статус**: Базовая версия готова
