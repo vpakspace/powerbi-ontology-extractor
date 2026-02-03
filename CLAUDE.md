@@ -89,15 +89,31 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 ---
 
-### 🔄 В работе: Интеграция с OntoGuard
+#### 4. ✅ Конвертер Fabric IQ JSON → OWL
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/export/fabric_iq_to_owl.py`
+- **Класс**: `FabricIQToOWLConverter`
+- **Реализовано**:
+  - [x] entities → owl:Class с DatatypeProperties
+  - [x] relationships → owl:ObjectProperty
+  - [x] businessRules → Action classes с requiresRole/appliesTo
+  - [x] Автогенерация CRUD action rules (read/create/update/delete)
+  - [x] Schema bindings как аннотации для drift detection
+  - [x] Constraints (min/max, required, unique)
+  - [x] Роли: Admin, Analyst, Viewer, Editor, Owner
+- **Тесты**: 22 passed (96% coverage)
+- **Использование**:
+  ```python
+  from powerbi_ontology.export import FabricIQExporter, FabricIQToOWLConverter
 
-#### 4. Конвертер Fabric IQ JSON → OWL
-- **Статус**: Не начато
-- Текущий `export/ontoguard.py` генерирует свой JSON формат
-- **TODO**:
-  - [ ] Создать конвертер в OWL (как в OntoGuard с RDFLib)
-  - [ ] Маппинг: entities → owl:Class, permissions → action rules
-  - [ ] Поддержка Microsoft Fabric native формата
+  exporter = FabricIQExporter(ontology)
+  converter = FabricIQToOWLConverter.from_fabric_iq_exporter(exporter)
+  converter.save("output.owl", format="xml")
+  ```
+
+---
+
+### 🔄 В работе: Интеграция с OntoGuard
 
 #### 5. Contract Builder + OntoGuard
 - **Статус**: Не начато
