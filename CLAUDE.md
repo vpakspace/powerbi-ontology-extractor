@@ -113,17 +113,40 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 ---
 
+#### 5. ✅ Contract Builder → OWL Converter
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/export/contract_to_owl.py`
+- **Класс**: `ContractToOWLConverter`
+- **Реализовано**:
+  - [x] read_entities → ReadAction с requiresRole/appliesTo
+  - [x] write_properties → WriteAction с requiresRole/appliesTo/appliesToProperty
+  - [x] executable_actions → ExecuteAction classes
+  - [x] business_rules → Action classes с constraints
+  - [x] context_filters → OWL annotations
+  - [x] audit_settings → Ontology annotations
+- **Тесты**: 22 passed (98% coverage)
+- **Использование**:
+  ```python
+  from powerbi_ontology.contract_builder import ContractBuilder
+  from powerbi_ontology.export import ContractToOWLConverter
+
+  builder = ContractBuilder(ontology)
+  contract = builder.build_contract("SalesAgent", permissions)
+  converter = ContractToOWLConverter(contract)
+  converter.save("sales_agent_contract.owl", format="xml")
+  ```
+
+---
+
 ### 🔄 В работе: Интеграция с OntoGuard
 
-#### 5. Contract Builder + OntoGuard
+#### 6. Подключить к validate_action_tool в OntoGuard
 - **Статус**: Не начато
-- `contract_builder.py` — property-level permissions (read/write/execute)
 - **TODO**:
-  - [ ] Конвертировать `SemanticContract` в OWL action rules
-  - [ ] Подключить к `validate_action_tool` в OntoGuard
+  - [ ] Интеграция ContractToOWLConverter с OntoGuard MCP Server
   - [ ] Тестирование E2E: .pbix → contract → OntoGuard validation
 
-#### 6. Улучшить OWL Exporter
+#### 7. Улучшить OWL Exporter
 - **Статус**: Базовая версия готова
 - Текущий `export/owl.py` — Classes + DatatypeProperties
 - **TODO**:
