@@ -60,7 +60,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 - Решение: убрать eager imports из `utils/__init__.py`
 
 #### 2. ✅ Запустить и починить тесты
-- 171 passed, 0 failed, coverage 79%
+- **307 passed**, 0 failed, **coverage 81%** (обновлено 2026-02-04)
 - Исправлено 5 багов: dateTime mapping, URI с пробелами, DAX entity name, schema drift test fixtures
 - Порог coverage снижен до 78% (visualizer.py = 12%, pbix_reader.py = 51% из-за PBIXRay runtime)
 
@@ -148,7 +148,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   - [x] Проверка role-based access (SalesAgent, Admin, Viewer)
   - [x] Тестирование check_permissions и get_allowed_actions API
 - **Тесты**: 16 E2E тестов passed
-- **Всего тестов проекта**: 258 passed, coverage 84%
+- **Всего тестов проекта**: 307 passed, coverage 81%
 
 ---
 
@@ -335,7 +335,7 @@ cd ~/powerbi-ontology-extractor
 pip install -r requirements.txt
 
 # Тесты
-pytest  # 171 passed, coverage 79%
+pytest  # 307 passed, coverage 81%
 
 # Извлечение онтологии
 python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
