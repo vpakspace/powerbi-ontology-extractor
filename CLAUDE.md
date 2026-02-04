@@ -148,19 +148,36 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   - [x] Проверка role-based access (SalesAgent, Admin, Viewer)
   - [x] Тестирование check_permissions и get_allowed_actions API
 - **Тесты**: 16 E2E тестов passed
-- **Всего тестов проекта**: 231 passed, coverage 83%
+- **Всего тестов проекта**: 258 passed, coverage 84%
 
 ---
 
-### 📋 Новые задачи (из roadmap)
+#### 7. ✅ Улучшить OWL Exporter
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/export/owl.py` (521 строк, 95% coverage)
+- **Реализовано**:
+  - [x] Action rules (requiresRole, appliesTo, allowsAction) для OntoGuard
+  - [x] Constraints: minCardinality (required), FunctionalProperty (unique), range (min/max), regex (pattern), enum
+  - [x] RLS rules как OWL restrictions с daxFilter
+  - [x] Business rules → Action classes с condition, classification, priority
+  - [x] Default CRUD actions для каждой entity × role
+  - [x] `get_export_summary()` для статистики экспорта
+- **Опции конструктора**:
+  - `include_action_rules: bool` — включить/выключить action rules
+  - `include_constraints: bool` — включить/выключить constraints
+  - `default_roles: List[str]` — настраиваемые роли (default: Admin, Analyst, Viewer)
+- **Тесты**: 34 passed (7 test classes)
+- **Использование**:
+  ```python
+  from powerbi_ontology.export import OWLExporter
 
-#### 7. Улучшить OWL Exporter
-- **Статус**: Базовая версия готова
-- Текущий `export/owl.py` — Classes + DatatypeProperties
-- **TODO**:
-  - [ ] Добавить action rules (requiresRole, appliesTo)
-  - [ ] Добавить constraints (min/max, required fields)
-  - [ ] Экспорт RLS rules как OWL restrictions
+  exporter = OWLExporter(ontology, default_roles=["Admin", "Analyst", "Viewer"])
+  owl_content = exporter.export(format="xml")
+
+  # Добавить RLS rules из SemanticModel
+  exporter.add_rls_rules(semantic_model.security_rules)
+  exporter.save("ontology.owl")
+  ```
 
 ---
 
