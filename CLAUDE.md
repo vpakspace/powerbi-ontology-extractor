@@ -185,7 +185,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 #### 9. ✅ Visual Ontology Editor (no-code UI)
 - **Статус**: Завершено
-- **Файл**: `ontology_editor.py` (950+ строк)
+- **Файл**: `ontology_editor.py` (1150+ строк)
 - **Технология**: Streamlit
 - **Реализовано**:
   - [x] **7 вкладок**: Load/Create, Entities, Relationships, Permissions, Business Rules, OWL Preview, **Diff & Merge**
@@ -203,6 +203,11 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
     - Run Merge: стратегии union/ours/theirs
     - Semantic Debt Analysis: обнаружение конфликтов
     - Use Merged as Current: применить результат
+  - [x] **Автосохранение и история** (добавлено 2026-02-04):
+    - Кнопка "💾 Save to History" в sidebar
+    - Секция "📚 Recent Ontologies" (последние 5 файлов)
+    - Быстрая загрузка из истории одним кликом
+    - Хранение в `data/ontologies/` (имя + timestamp)
 - **Запуск**:
   ```bash
   streamlit run ontology_editor.py --server.port 8503
@@ -493,12 +498,20 @@ python -m powerbi_ontology.cli <command> [options]
 - Run Diff, Run Merge, Semantic Debt Analysis
 - Стратегии: union, ours, theirs
 
+**Новая фича: Автосохранение и история**:
+- Кнопка "💾 Save to History" в sidebar
+- Секция "📚 Recent Ontologies" (последние 5 файлов)
+- Хранение в `data/ontologies/` с timestamp
+- Быстрая загрузка из истории одним кликом
+- Протестировано: оба .pbix сохранены и загружены из истории ✅
+
 **Коммиты**:
 - `7b652c8` — fix: Prevent infinite rerun loop when loading .pbix in Streamlit UI
 - `ca716fa` — docs: Update project memory with debugging results
 - `972c43f` — docs: Add Adventure Works test results
 - `0f2ddfc` — docs: Add CLI test results
 - `5b6a783` — feat: Add Diff & Merge tab to Streamlit UI
+- `d7de9f2` — feat: Add autosave and recent ontologies history
 
 ---
 
