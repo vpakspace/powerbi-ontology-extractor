@@ -4,6 +4,9 @@ networkx>=3.0
 pyparsing>=3.0.0
 pandas>=2.0.0
 
+# PBIX parsing (binary DataModel)
+pbixray>=0.5.0
+
 # CLI
 click>=8.0.0
 rich>=13.0.0
