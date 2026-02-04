@@ -36,6 +36,11 @@ from powerbi_ontology.export.owl import OWLExporter
 from powerbi_ontology.contract_builder import ContractBuilder
 from powerbi_ontology.ontology_diff import OntologyDiff, OntologyMerge, diff_ontologies
 from powerbi_ontology.semantic_debt import SemanticDebtAnalyzer
+from powerbi_ontology.chat import OntologyChat, create_chat
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 # Page config
 st.set_page_config(
@@ -64,6 +69,13 @@ def init_session_state():
         st.session_state.diff_report = None
     if "merged_ontology" not in st.session_state:
         st.session_state.merged_ontology = None
+    # Chat state
+    if "chat_instance" not in st.session_state:
+        st.session_state.chat_instance = None
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    if "chat_role" not in st.session_state:
+        st.session_state.chat_role = "Analyst"
 
 
 def get_safe_filename(name: str) -> str:
@@ -1109,6 +1121,129 @@ def render_diff_merge_tab():
         st.info("👆 Upload a second ontology to compare and merge.")
 
 
+def render_chat_tab():
+    """Render Chat tab for AI-powered Q&A about the ontology."""
+    st.header("💬 Ontology Chat")
+
+    if not st.session_state.ontology:
+        st.warning("⚠️ Load an ontology first to start chatting.")
+        return
+
+    ont = st.session_state.ontology
+
+    # Check if OpenAI API key is configured
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key or api_key == "your-openai-api-key-here":
+        st.error("⚠️ OPENAI_API_KEY not configured. Please set it in .env file.")
+        st.code("""
+# .env file:
+OPENAI_API_KEY=sk-your-actual-key-here
+        """)
+        return
+
+    # Initialize chat instance
+    if st.session_state.chat_instance is None:
+        try:
+            st.session_state.chat_instance = create_chat()
+        except Exception as e:
+            st.error(f"Error initializing chat: {e}")
+            return
+
+    chat = st.session_state.chat_instance
+
+    # Layout
+    col1, col2 = st.columns([3, 1])
+
+    with col2:
+        st.subheader("⚙️ Settings")
+
+        # Role selection
+        st.session_state.chat_role = st.selectbox(
+            "Your Role",
+            st.session_state.roles,
+            index=st.session_state.roles.index(st.session_state.chat_role)
+            if st.session_state.chat_role in st.session_state.roles
+            else 0,
+        )
+
+        # Ontology info
+        st.divider()
+        st.caption(f"📊 **{ont.name}**")
+        st.caption(f"Entities: {len(ont.entities)}")
+        st.caption(f"Relationships: {len(ont.relationships)}")
+        st.caption(f"Rules: {len(ont.business_rules)}")
+
+        # Suggested questions
+        st.divider()
+        st.subheader("💡 Suggestions")
+        suggestions = chat.get_suggestions(ont)
+        for suggestion in suggestions[:4]:
+            if st.button(suggestion[:30] + "..." if len(suggestion) > 30 else suggestion, key=f"sug_{hash(suggestion)}"):
+                st.session_state.pending_question = suggestion
+
+        # Clear history button
+        st.divider()
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.chat_history = []
+            chat.clear_history()
+            st.rerun()
+
+    with col1:
+        # Chat history display
+        chat_container = st.container()
+
+        with chat_container:
+            if not st.session_state.chat_history:
+                st.info(f"👋 Ask me anything about **{ont.name}**!")
+                st.caption("Examples: 'What entities exist?', 'How are Customer and Sales related?'")
+            else:
+                for msg in st.session_state.chat_history:
+                    if msg["role"] == "user":
+                        st.chat_message("user").write(msg["content"])
+                    else:
+                        st.chat_message("assistant").write(msg["content"])
+
+        # Input area
+        st.divider()
+
+        # Check for pending question from suggestions
+        initial_value = ""
+        if "pending_question" in st.session_state:
+            initial_value = st.session_state.pending_question
+            del st.session_state.pending_question
+
+        # Question input
+        question = st.text_input(
+            "Your question",
+            value=initial_value,
+            placeholder="Ask about entities, relationships, measures...",
+            key="chat_input",
+        )
+
+        col_send, col_spacer = st.columns([1, 4])
+        with col_send:
+            send_clicked = st.button("🚀 Send", type="primary", use_container_width=True)
+
+        if send_clicked and question:
+            # Add user message
+            st.session_state.chat_history.append({"role": "user", "content": question})
+
+            # Get AI response
+            with st.spinner("Thinking..."):
+                try:
+                    answer = chat.ask(
+                        question=question,
+                        ontology=ont,
+                        user_role=st.session_state.chat_role,
+                    )
+                    st.session_state.chat_history.append({"role": "assistant", "content": answer})
+                except Exception as e:
+                    error_msg = f"Error: {str(e)}"
+                    st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
+
+            st.rerun()
+
+
 def main():
     """Main application."""
     init_session_state()
@@ -1123,6 +1258,7 @@ def main():
         "📜 Business Rules",
         "🦉 OWL Preview",
         "🔀 Diff & Merge",
+        "💬 Chat",
     ])
 
     with tabs[0]:
@@ -1145,6 +1281,9 @@ def main():
 
     with tabs[6]:
         render_diff_merge_tab()
+
+    with tabs[7]:
+        render_chat_tab()
 
 
 if __name__ == "__main__":
