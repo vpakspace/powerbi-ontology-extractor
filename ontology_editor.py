@@ -48,6 +48,8 @@ def init_session_state():
         st.session_state.permissions = {}
     if "roles" not in st.session_state:
         st.session_state.roles = ["Admin", "Analyst", "Viewer"]
+    if "loaded_file" not in st.session_state:
+        st.session_state.loaded_file = None  # Track loaded file to prevent re-processing
 
 
 def create_empty_ontology(name: str) -> Ontology:
@@ -241,6 +243,7 @@ def render_sidebar():
         if st.sidebar.button("🗑️ Clear Ontology", use_container_width=True, type="secondary"):
             st.session_state.ontology = None
             st.session_state.selected_entity = None
+            st.session_state.loaded_file = None  # Reset to allow re-loading
             st.rerun()
     else:
         st.sidebar.info("No ontology loaded. Create or import one.")
@@ -279,29 +282,37 @@ def render_load_tab():
         # PBIX import (if available)
         uploaded_pbix = st.file_uploader("Upload .pbix", type=["pbix"])
         if uploaded_pbix:
-            temp_path = None
-            try:
-                # Save to temp file
-                with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
-                    f.write(uploaded_pbix.read())
-                    temp_path = f.name
+            # Prevent re-processing the same file on rerun
+            file_key = f"{uploaded_pbix.name}_{uploaded_pbix.size}"
+            if st.session_state.loaded_file == file_key:
+                st.info(f"✅ Already loaded: {uploaded_pbix.name}")
+            else:
+                temp_path = None
+                try:
+                    # Save to temp file
+                    with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
+                        f.write(uploaded_pbix.read())
+                        temp_path = f.name
 
-                # Try to extract
-                from powerbi_ontology.extractor import PowerBIExtractor
-                from powerbi_ontology.ontology_generator import OntologyGenerator
+                    # Try to extract
+                    from powerbi_ontology.extractor import PowerBIExtractor
+                    from powerbi_ontology.ontology_generator import OntologyGenerator
 
-                extractor = PowerBIExtractor(temp_path)
-                semantic_model = extractor.extract()
-                generator = OntologyGenerator(semantic_model)
-                st.session_state.ontology = generator.generate()
+                    with st.spinner(f"Extracting {uploaded_pbix.name}..."):
+                        extractor = PowerBIExtractor(temp_path)
+                        semantic_model = extractor.extract()
+                        generator = OntologyGenerator(semantic_model)
+                        st.session_state.ontology = generator.generate()
 
-                st.success(f"Extracted ontology from {uploaded_pbix.name}")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Error extracting from PBIX: {e}")
-            finally:
-                if temp_path:
-                    Path(temp_path).unlink(missing_ok=True)
+                    # Mark file as loaded to prevent re-processing
+                    st.session_state.loaded_file = file_key
+                    st.success(f"✅ Extracted ontology from {uploaded_pbix.name}")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error extracting from PBIX: {e}")
+                finally:
+                    if temp_path:
+                        Path(temp_path).unlink(missing_ok=True)
 
 
 def render_entities_tab():
