@@ -14,6 +14,7 @@ from powerbi_ontology.contract_builder import ContractBuilder
 from powerbi_ontology.schema_mapper import SchemaMapper
 from powerbi_ontology.semantic_debt import SemanticDebtAnalyzer, SemanticDebtReport, analyze_ontologies
 from powerbi_ontology.ontology_diff import OntologyDiff, DiffReport, diff_ontologies, merge_ontologies
+from powerbi_ontology.review import OntologyReview, ReviewWorkflow, ReviewStatus, create_review
 
 __all__ = [
     "PowerBIExtractor",
@@ -30,4 +31,8 @@ __all__ = [
     "DiffReport",
     "diff_ontologies",
     "merge_ontologies",
+    "OntologyReview",
+    "ReviewWorkflow",
+    "ReviewStatus",
+    "create_review",
 ]

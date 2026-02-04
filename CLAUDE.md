@@ -60,7 +60,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 - Решение: убрать eager imports из `utils/__init__.py`
 
 #### 2. ✅ Запустить и починить тесты
-- **307 passed**, 0 failed, **coverage 81%** (обновлено 2026-02-04)
+- **340 passed**, 0 failed, **coverage 82%** (обновлено 2026-02-04)
 - Исправлено 5 багов: dateTime mapping, URI с пробелами, DAX entity name, schema drift test fixtures
 - Порог coverage снижен до 78% (visualizer.py = 12%, pbix_reader.py = 51% из-за PBIXRay runtime)
 
@@ -148,7 +148,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   - [x] Проверка role-based access (SalesAgent, Admin, Viewer)
   - [x] Тестирование check_permissions и get_allowed_actions API
 - **Тесты**: 16 E2E тестов passed
-- **Всего тестов проекта**: 307 passed, coverage 81%
+- **Всего тестов проекта**: 340 passed, coverage 82%
 
 ---
 
@@ -291,13 +291,42 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   pbix2owl diff -s v1.json -t v2.json -f changelog
   ```
 
-#### 13. Collaborative Ontology Review
-- **Приоритет**: LOW
+#### 13. ✅ Collaborative Ontology Review
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/review.py` (500 строк, 93% coverage)
 - **Цель**: Workflow для review и approve онтологий командой
-- **Фичи**:
-  - [ ] Комментарии к entities/rules
-  - [ ] Approval workflow (draft → review → approved)
-  - [ ] Интеграция с Slack/Teams
+- **Реализовано**:
+  - [x] `OntologyReview` — хранение состояния review с комментариями
+  - [x] `ReviewComment` — комментарии к entities/properties/rules
+  - [x] `ReviewWorkflow` — state machine (draft → in_review → approved → published)
+  - [x] `ReviewReport` — генерация markdown отчётов
+  - [x] Replies и resolve для комментариев
+  - [x] Audit trail (history всех действий)
+  - [x] Сериализация в JSON (save/load)
+- **Тесты**: 33 passed (6 test classes)
+- **Workflow состояния**:
+  ```
+  draft → in_review → approved → published
+                   ↘ changes_requested → in_review
+                   ↘ rejected → draft
+  ```
+- **Использование**:
+  ```python
+  from powerbi_ontology import create_review, ReviewWorkflow
+
+  # Создание review
+  review = create_review(ontology)
+  review.add_comment("alice", "Check Customer entity", TargetType.ENTITY, "Customer")
+
+  # Workflow
+  workflow = ReviewWorkflow(review)
+  workflow.submit_for_review("alice", reviewers=["bob", "carol"])
+  workflow.approve("bob", "Looks good")
+  workflow.publish("admin")
+
+  # Сохранение
+  review.save("review.json")
+  ```
 
 ---
 
@@ -335,7 +364,7 @@ cd ~/powerbi-ontology-extractor
 pip install -r requirements.txt
 
 # Тесты
-pytest  # 307 passed, coverage 81%
+pytest  # 340 passed, coverage 82%
 
 # Извлечение онтологии
 python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
