@@ -426,16 +426,27 @@ python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
   | Admin | delete | Sales_Territory | ✅ ALLOWED |
   | Analyst | read | Reseller | ✅ ALLOWED |
 
-### Этап 9-10: CLI и документирование
-- [ ] Тест CLI (опционально)
-- [x] Баг задокументирован и исправлен
+### Этап 9: CLI тестирование ✅
+- [x] **extract**: 1 файл → 1656 triples OWL
+- [x] **batch**: 2 файла → 2 OWL (100% success rate)
+- [x] **analyze**: 3 CRITICAL конфликта найдено (Customer, Product, Date)
+- [x] **diff**: 136 изменений (51 added, 82 removed, 3 modified)
+
+**Команда запуска CLI**:
+```bash
+python -m powerbi_ontology.cli <command> [options]
+```
+
+### Этап 10: Документирование ✅
+- [x] Баг бесконечного цикла задокументирован и исправлен
+- [x] Все результаты тестирования записаны в CLAUDE.md
 
 ### ✅ Чеклист готовности к production
 - [x] Оба .pbix файла загружаются без ошибок
 - [x] OWL экспорт валиден (1734 + 1083 triples)
 - [x] OntoGuard принимает OWL
 - [x] Permissions работают корректно (9/9 тестов всего)
-- [ ] CLI тестирование (опционально)
+- [x] CLI работает (4/4 команд протестировано)
 
 ---
 
@@ -464,9 +475,18 @@ python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
 | Action Rules | 192 | 132 |
 | OntoGuard Tests | 4/4 ✅ | 5/5 ✅ |
 
+**CLI тестирование (4/4 команд)**:
+| Команда | Результат |
+|---------|-----------|
+| extract | 1656 triples |
+| batch | 2/2 files, 100% |
+| analyze | 3 conflicts |
+| diff | 136 changes |
+
 **Коммиты**:
 - `7b652c8` — fix: Prevent infinite rerun loop when loading .pbix in Streamlit UI
 - `ca716fa` — docs: Update project memory with debugging results
+- `972c43f` — docs: Add Adventure Works test results
 
 ---
 
