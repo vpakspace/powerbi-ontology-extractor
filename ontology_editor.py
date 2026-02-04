@@ -28,6 +28,8 @@ from powerbi_ontology.ontology_generator import (
 )
 from powerbi_ontology.export.owl import OWLExporter
 from powerbi_ontology.contract_builder import ContractBuilder
+from powerbi_ontology.ontology_diff import OntologyDiff, OntologyMerge, diff_ontologies
+from powerbi_ontology.semantic_debt import SemanticDebtAnalyzer
 
 # Page config
 st.set_page_config(
@@ -50,6 +52,12 @@ def init_session_state():
         st.session_state.roles = ["Admin", "Analyst", "Viewer"]
     if "loaded_file" not in st.session_state:
         st.session_state.loaded_file = None  # Track loaded file to prevent re-processing
+    if "compare_ontology" not in st.session_state:
+        st.session_state.compare_ontology = None  # Second ontology for diff/merge
+    if "diff_report" not in st.session_state:
+        st.session_state.diff_report = None
+    if "merged_ontology" not in st.session_state:
+        st.session_state.merged_ontology = None
 
 
 def create_empty_ontology(name: str) -> Ontology:
@@ -841,6 +849,180 @@ def render_owl_preview_tab():
             st.error(f"Error generating OWL: {e}")
 
 
+def render_diff_merge_tab():
+    """Render Diff & Merge tab."""
+    st.header("🔀 Diff & Merge")
+
+    if not st.session_state.ontology:
+        st.warning("Load or create an ontology first (Tab 1).")
+        return
+
+    ont = st.session_state.ontology
+
+    st.info(f"**Current ontology**: {ont.name} ({len(ont.entities)} entities)")
+
+    # Upload second ontology for comparison
+    st.subheader("📂 Load Second Ontology for Comparison")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        uploaded_json = st.file_uploader("Upload JSON ontology", type=["json"], key="diff_json")
+        if uploaded_json:
+            try:
+                json_data = json.load(uploaded_json)
+                st.session_state.compare_ontology = load_ontology_from_json(json_data)
+                st.success(f"Loaded: {st.session_state.compare_ontology.name}")
+            except Exception as e:
+                st.error(f"Error loading JSON: {e}")
+
+    with col2:
+        uploaded_pbix = st.file_uploader("Upload .pbix file", type=["pbix"], key="diff_pbix")
+        if uploaded_pbix:
+            file_key = f"diff_{uploaded_pbix.name}_{uploaded_pbix.size}"
+            if st.session_state.get("diff_loaded_file") != file_key:
+                temp_path = None
+                try:
+                    with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
+                        f.write(uploaded_pbix.read())
+                        temp_path = f.name
+
+                    from powerbi_ontology.extractor import PowerBIExtractor
+                    from powerbi_ontology.ontology_generator import OntologyGenerator
+
+                    with st.spinner(f"Extracting {uploaded_pbix.name}..."):
+                        extractor = PowerBIExtractor(temp_path)
+                        semantic_model = extractor.extract()
+                        generator = OntologyGenerator(semantic_model)
+                        st.session_state.compare_ontology = generator.generate()
+
+                    st.session_state["diff_loaded_file"] = file_key
+                    st.success(f"Extracted: {st.session_state.compare_ontology.name}")
+                except Exception as e:
+                    st.error(f"Error extracting from PBIX: {e}")
+                finally:
+                    if temp_path:
+                        Path(temp_path).unlink(missing_ok=True)
+
+    # Show comparison info
+    if st.session_state.compare_ontology:
+        comp = st.session_state.compare_ontology
+        st.success(f"**Compare ontology**: {comp.name} ({len(comp.entities)} entities)")
+
+        st.divider()
+
+        # Diff section
+        st.subheader("📊 Diff (Compare)")
+
+        if st.button("🔍 Run Diff", type="primary"):
+            try:
+                differ = OntologyDiff(ont, comp)
+                st.session_state.diff_report = differ.diff()
+                st.success("Diff completed!")
+            except Exception as e:
+                st.error(f"Error running diff: {e}")
+
+        if st.session_state.diff_report:
+            report = st.session_state.diff_report
+
+            # Summary metrics
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Total Changes", report.total_changes)
+            col2.metric("➕ Added", report.added_count)
+            col3.metric("➖ Removed", report.removed_count)
+            col4.metric("📝 Modified", report.modified_count)
+
+            # Changelog
+            with st.expander("📋 View Changelog", expanded=True):
+                st.markdown(report.to_changelog())
+
+            # Download
+            st.download_button(
+                "📥 Download Changelog",
+                report.to_changelog(),
+                "changelog.md",
+                "text/markdown",
+            )
+
+        st.divider()
+
+        # Merge section
+        st.subheader("🔀 Merge")
+
+        merge_strategy = st.selectbox(
+            "Merge Strategy",
+            ["union", "ours", "theirs"],
+            help="union=combine all, ours=prefer current, theirs=prefer compare"
+        )
+
+        if st.button("🔀 Run Merge", type="primary"):
+            try:
+                merger = OntologyMerge(
+                    base=ont,
+                    ours=ont,
+                    theirs=comp
+                )
+                merged, conflicts = merger.merge(strategy=merge_strategy)
+                st.session_state.merged_ontology = merged
+
+                st.success(f"Merge completed! Result: {len(merged.entities)} entities")
+
+                if conflicts:
+                    st.warning(f"⚠️ {len(conflicts)} conflicts detected")
+                    with st.expander("View Conflicts"):
+                        for c in conflicts:
+                            st.write(f"• {c.get('type', 'unknown')}: {c.get('element', '')}")
+            except Exception as e:
+                st.error(f"Error merging: {e}")
+
+        if st.session_state.merged_ontology:
+            merged = st.session_state.merged_ontology
+
+            # Merged stats
+            st.write(f"**Merged ontology**: {merged.name}")
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Entities", len(merged.entities))
+            col2.metric("Relationships", len(merged.relationships))
+            col3.metric("Business Rules", len(merged.business_rules))
+
+            # Use merged as current
+            if st.button("✅ Use Merged as Current Ontology"):
+                st.session_state.ontology = merged
+                st.session_state.merged_ontology = None
+                st.session_state.compare_ontology = None
+                st.session_state.diff_report = None
+                st.success("Merged ontology is now the current ontology!")
+                st.rerun()
+
+        st.divider()
+
+        # Semantic Debt Analysis
+        st.subheader("📈 Semantic Debt Analysis")
+
+        if st.button("🔍 Analyze Conflicts"):
+            try:
+                analyzer = SemanticDebtAnalyzer()
+                analyzer.add_ontology(ont.name, ont)
+                analyzer.add_ontology(comp.name, comp)
+                debt_report = analyzer.analyze()
+
+                st.metric("Total Conflicts", debt_report.total_conflicts)
+
+                col1, col2, col3 = st.columns(3)
+                col1.metric("🔴 Critical", debt_report.critical_count)
+                col2.metric("🟡 Warning", debt_report.warning_count)
+                col3.metric("🔵 Info", debt_report.info_count)
+
+                if debt_report.conflicts:
+                    with st.expander("View Conflicts", expanded=True):
+                        st.markdown(debt_report.to_markdown())
+            except Exception as e:
+                st.error(f"Error analyzing: {e}")
+
+    else:
+        st.info("👆 Upload a second ontology to compare and merge.")
+
+
 def main():
     """Main application."""
     init_session_state()
@@ -854,6 +1036,7 @@ def main():
         "🔐 Permissions",
         "📜 Business Rules",
         "🦉 OWL Preview",
+        "🔀 Diff & Merge",
     ])
 
     with tabs[0]:
@@ -873,6 +1056,9 @@ def main():
 
     with tabs[5]:
         render_owl_preview_tab()
+
+    with tabs[6]:
+        render_diff_merge_tab()
 
 
 if __name__ == "__main__":
