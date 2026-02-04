@@ -183,15 +183,27 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 ### 📋 Новые задачи (из roadmap)
 
-#### 9. Visual Ontology Editor (no-code UI)
-- **Приоритет**: HIGH
-- **Цель**: GUI для добавления "missing 30%" (business rules, constraints)
-- **Технологии**: Streamlit или React
-- **Фичи**:
-  - [ ] Drag-and-drop редактирование entities и relationships
-  - [ ] Визуальное добавление permissions (read/write/execute)
-  - [ ] Preview сгенерированного OWL
-  - [ ] Валидация правил в реальном времени
+#### 9. ✅ Visual Ontology Editor (no-code UI)
+- **Статус**: Завершено
+- **Файл**: `ontology_editor.py` (750+ строк)
+- **Технология**: Streamlit
+- **Реализовано**:
+  - [x] **6 вкладок**: Load/Create, Entities, Relationships, Permissions, Business Rules, OWL Preview
+  - [x] Загрузка из .pbix файлов и JSON
+  - [x] Редактирование entities с properties
+  - [x] Редактирование relationships между entities
+  - [x] Permission matrix: read/write/execute per role
+  - [x] Business rules с classification и priority
+  - [x] Preview OWL с summary statistics
+  - [x] Экспорт в JSON и OWL форматы
+  - [x] Constraints: range, regex, enum
+- **Запуск**:
+  ```bash
+  streamlit run ontology_editor.py --server.port 8503
+  # или
+  ./run_editor.sh
+  ```
+- **Пример**: `examples/sample_ontology.json`
 
 #### 10. Multi-Dashboard Semantic Debt Analysis
 - **Приоритет**: HIGH

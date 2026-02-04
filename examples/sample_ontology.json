@@ -1,0 +1,200 @@
+{
+  "name": "Sales_Ontology",
+  "version": "1.0.0",
+  "source": "Sample",
+  "entities": [
+    {
+      "name": "Customer",
+      "description": "Customer entity with contact information",
+      "entity_type": "dimension",
+      "properties": [
+        {
+          "name": "CustomerId",
+          "data_type": "Integer",
+          "required": true,
+          "unique": true,
+          "description": "Unique customer identifier",
+          "constraints": []
+        },
+        {
+          "name": "Name",
+          "data_type": "String",
+          "required": true,
+          "unique": false,
+          "description": "Customer full name",
+          "constraints": []
+        },
+        {
+          "name": "Email",
+          "data_type": "String",
+          "required": false,
+          "unique": true,
+          "description": "Customer email address",
+          "constraints": [
+            {
+              "type": "regex",
+              "value": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "message": "Invalid email format"
+            }
+          ]
+        },
+        {
+          "name": "Region",
+          "data_type": "String",
+          "required": false,
+          "unique": false,
+          "description": "Customer region",
+          "constraints": [
+            {
+              "type": "enum",
+              "value": ["US", "EU", "APAC", "LATAM"],
+              "message": "Must be a valid region code"
+            }
+          ]
+        }
+      ],
+      "constraints": []
+    },
+    {
+      "name": "Order",
+      "description": "Sales order with amount and status",
+      "entity_type": "fact",
+      "properties": [
+        {
+          "name": "OrderId",
+          "data_type": "Integer",
+          "required": true,
+          "unique": true,
+          "description": "Unique order identifier",
+          "constraints": []
+        },
+        {
+          "name": "CustomerId",
+          "data_type": "Integer",
+          "required": true,
+          "unique": false,
+          "description": "Reference to customer",
+          "constraints": []
+        },
+        {
+          "name": "OrderDate",
+          "data_type": "DateTime",
+          "required": true,
+          "unique": false,
+          "description": "Date of the order",
+          "constraints": []
+        },
+        {
+          "name": "Amount",
+          "data_type": "Decimal",
+          "required": true,
+          "unique": false,
+          "description": "Order total amount",
+          "constraints": [
+            {
+              "type": "range",
+              "value": {"min": 0, "max": 1000000},
+              "message": "Amount must be between 0 and 1,000,000"
+            }
+          ]
+        },
+        {
+          "name": "Status",
+          "data_type": "String",
+          "required": true,
+          "unique": false,
+          "description": "Order status",
+          "constraints": [
+            {
+              "type": "enum",
+              "value": ["pending", "confirmed", "shipped", "delivered", "cancelled"],
+              "message": "Invalid order status"
+            }
+          ]
+        }
+      ],
+      "constraints": []
+    },
+    {
+      "name": "Product",
+      "description": "Product catalog",
+      "entity_type": "dimension",
+      "properties": [
+        {
+          "name": "ProductId",
+          "data_type": "Integer",
+          "required": true,
+          "unique": true,
+          "description": "Unique product identifier",
+          "constraints": []
+        },
+        {
+          "name": "Name",
+          "data_type": "String",
+          "required": true,
+          "unique": false,
+          "description": "Product name",
+          "constraints": []
+        },
+        {
+          "name": "Category",
+          "data_type": "String",
+          "required": false,
+          "unique": false,
+          "description": "Product category",
+          "constraints": []
+        },
+        {
+          "name": "Price",
+          "data_type": "Decimal",
+          "required": true,
+          "unique": false,
+          "description": "Product unit price",
+          "constraints": [
+            {
+              "type": "range",
+              "value": {"min": 0, "max": 10000},
+              "message": "Price must be between 0 and 10,000"
+            }
+          ]
+        }
+      ],
+      "constraints": []
+    }
+  ],
+  "relationships": [
+    {
+      "from_entity": "Order",
+      "to_entity": "Customer",
+      "from_property": "CustomerId",
+      "to_property": "CustomerId",
+      "relationship_type": "belongs_to",
+      "cardinality": "many-to-one",
+      "description": "Order belongs to a customer"
+    }
+  ],
+  "business_rules": [
+    {
+      "name": "HighValueOrder",
+      "entity": "Order",
+      "condition": "Amount > 10000",
+      "action": "RequireApproval",
+      "classification": "high",
+      "description": "Orders over $10,000 require manager approval",
+      "priority": 1
+    },
+    {
+      "name": "AutoApproveSmall",
+      "entity": "Order",
+      "condition": "Amount < 100",
+      "action": "AutoApprove",
+      "classification": "low",
+      "description": "Small orders auto-approved",
+      "priority": 2
+    }
+  ],
+  "metadata": {
+    "created_by": "Sample Generator",
+    "purpose": "Demo for Ontology Editor"
+  }
+}
