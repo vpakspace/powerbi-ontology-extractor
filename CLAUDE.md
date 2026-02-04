@@ -388,11 +388,10 @@ python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
 - [x] **Баг исправлен**: бесконечный цикл загрузки (commit `7b652c8`)
   - Причина: `st.rerun()` вызывался повторно при каждом рендере
   - Решение: добавлен `loaded_file` tracking в session_state
-- [x] Извлечено из Sales_Returns_Sample.pbix:
-  - 15 entities
-  - 9 relationships
-  - 58 DAX measures
-  - 32 business rules (сгенерировано)
+- [x] **Sales_Returns_Sample.pbix**:
+  - 15 entities, 9 relationships, 58 DAX measures, 32 business rules
+- [x] **Adventure_Works_DW_2020.pbix**:
+  - 11 entities, 13 relationships, 0 DAX measures, 0 business rules
 
 ### Этап 3-6: Редактирование в UI ✅
 - [x] Entities отображаются корректно
@@ -411,45 +410,63 @@ python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
 
 ### Этап 8: OntoGuard интеграция ✅
 - [x] OWL загружен в OntoGuard OntologyValidator
-- [x] **Тесты permissions (4/4 passed)**:
+- [x] **Sales Returns тесты (4/4 passed)**:
   | Роль | Действие | Entity | Результат |
   |------|----------|--------|-----------|
   | Analyst | read | Customer | ✅ ALLOWED |
   | Viewer | delete | Product | ✅ ALLOWED |
   | Admin | delete | Customer | ✅ ALLOWED |
   | Analyst | update | Store | ✅ ALLOWED |
+- [x] **Adventure Works тесты (5/5 passed)**:
+  | Роль | Действие | Entity | Результат |
+  |------|----------|--------|-----------|
+  | Admin | read | Customer | ✅ ALLOWED |
+  | Analyst | update | Sales | ✅ ALLOWED |
+  | Viewer | delete | Product | ✅ ALLOWED |
+  | Admin | delete | Sales_Territory | ✅ ALLOWED |
+  | Analyst | read | Reseller | ✅ ALLOWED |
 
 ### Этап 9-10: CLI и документирование
 - [ ] Тест CLI (опционально)
 - [x] Баг задокументирован и исправлен
 
 ### ✅ Чеклист готовности к production
-- [x] .pbix файлы загружаются без ошибок
-- [x] OWL экспорт валиден (rdflib парсит 1734 triples)
+- [x] Оба .pbix файла загружаются без ошибок
+- [x] OWL экспорт валиден (1734 + 1083 triples)
 - [x] OntoGuard принимает OWL
-- [x] Permissions работают корректно (4/4 тестов)
+- [x] Permissions работают корректно (9/9 тестов всего)
 - [ ] CLI тестирование (опционально)
 
 ---
 
 ## История сессий
 
-### 2026-02-04 (вечер) — Отладка Streamlit UI с реальными данными ✅
+### 2026-02-04 (вечер) — Отладка Streamlit UI + Тестирование обоих .pbix файлов ✅
 
 **Выполнено**:
 - ✅ Тестирование полного pipeline: .pbix → Streamlit UI → OWL → OntoGuard
 - ✅ **Исправлен баг**: бесконечный цикл загрузки .pbix файлов
   - Причина: `st.rerun()` без tracking загруженного файла
   - Решение: `loaded_file` в session_state
-- ✅ Валидация OWL через rdflib (1734 triples)
-- ✅ Интеграция с OntoGuard (4/4 permission тестов passed)
 - ✅ Очистка /tmp от 2730 временных директорий pbix_extract_*
+- ✅ Протестированы **оба** тестовых файла
 
-**Тестовые данные**:
-- `Sales_Returns_Sample.pbix` → 15 entities, 58 measures, 1734 OWL triples
+**Сравнение тестовых файлов**:
+
+| Метрика | Sales Returns | Adventure Works |
+|---------|---------------|-----------------|
+| Размер | 6.3 MB | 7.8 MB |
+| Entities | 15 | 11 |
+| Relationships | 9 | 13 |
+| DAX Measures | 58 | 0 |
+| Business Rules | 32 | 0 |
+| OWL Triples | 1734 | 1083 |
+| Action Rules | 192 | 132 |
+| OntoGuard Tests | 4/4 ✅ | 5/5 ✅ |
 
 **Коммиты**:
 - `7b652c8` — fix: Prevent infinite rerun loop when loading .pbix in Streamlit UI
+- `ca716fa` — docs: Update project memory with debugging results
 
 ---
 
