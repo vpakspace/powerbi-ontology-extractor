@@ -232,13 +232,31 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   print(report.to_dict())       # JSON-совместимый dict
   ```
 
-#### 11. Ontology Diff Tool
-- **Приоритет**: MEDIUM
+#### 11. ✅ Ontology Diff Tool
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/ontology_diff.py` (730 строк, 84% coverage)
 - **Цель**: Сравнение версий онтологий
-- **Фичи**:
-  - [ ] Visual diff двух .owl файлов
-  - [ ] Changelog генерация
-  - [ ] Git-like merge для онтологий
+- **Реализовано**:
+  - [x] `OntologyDiff` — сравнение двух версий онтологий
+  - [x] `DiffReport` — отчёт с to_dict(), to_changelog(), to_unified_diff()
+  - [x] 4 типа элементов: ENTITY, PROPERTY, RELATIONSHIP, RULE, METADATA
+  - [x] 4 типа изменений: ADDED, REMOVED, MODIFIED, UNCHANGED
+  - [x] `OntologyMerge` — три-стороннее слияние (base, ours, theirs)
+  - [x] Conflict detection и resolution strategies
+  - [x] Git-like changelog генерация
+- **Тесты**: 21 passed (7 test classes)
+- **Использование**:
+  ```python
+  from powerbi_ontology import OntologyDiff, diff_ontologies, merge_ontologies
+
+  # Diff
+  report = diff_ontologies(old_ontology, new_ontology)
+  print(report.to_changelog())  # Markdown changelog
+  print(report.to_dict())       # JSON-совместимый dict
+
+  # Merge (three-way)
+  merged, conflicts = merge_ontologies(base, ours, theirs)
+  ```
 
 #### 12. CLI Batch Processing
 - **Приоритет**: MEDIUM
