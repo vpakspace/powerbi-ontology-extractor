@@ -35,7 +35,8 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "pbi-ontology=cli.pbi_ontology_cli:main",
+            "pbix2owl=powerbi_ontology.cli:main",
+            "pbi-ontology=powerbi_ontology.cli:main",
         ],
     },
     include_package_data=True,

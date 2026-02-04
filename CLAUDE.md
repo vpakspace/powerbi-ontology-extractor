@@ -258,13 +258,38 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   merged, conflicts = merge_ontologies(base, ours, theirs)
   ```
 
-#### 12. CLI Batch Processing
-- **Приоритет**: MEDIUM
+#### 12. ✅ CLI Batch Processing
+- **Статус**: Завершено
+- **Файл**: `powerbi_ontology/cli.py` (480 строк, 60% coverage)
 - **Цель**: Обработка папки с .pbix файлами
-- **Фичи**:
-  - [ ] `pbix2owl --input ./dashboards/ --output ./ontologies/`
-  - [ ] Параллельная обработка
-  - [ ] Progress bar и отчёт
+- **Реализовано**:
+  - [x] `pbix2owl extract --input file.pbix --output ontology.owl`
+  - [x] `pbix2owl batch --input ./dashboards/ --output ./ontologies/ --workers 4`
+  - [x] `pbix2owl analyze --input ./ontologies/ --output report.md`
+  - [x] `pbix2owl diff --source v1.json --target v2.json`
+  - [x] Параллельная обработка (ThreadPoolExecutor)
+  - [x] Rich progress bar и summary tables
+  - [x] Recursive directory search (`--recursive`)
+  - [x] Multiple output formats (OWL, JSON, Markdown)
+- **Тесты**: 19 passed (7 test classes)
+- **Entry Points**: `pbix2owl`, `pbi-ontology`
+- **Использование**:
+  ```bash
+  # Установка
+  pip install -e .
+
+  # Извлечение одного файла
+  pbix2owl extract -i sales.pbix -o sales.owl
+
+  # Batch обработка директории
+  pbix2owl batch -i ./dashboards/ -o ./ontologies/ -w 8 --recursive
+
+  # Анализ семантического долга
+  pbix2owl analyze -i ./ontologies/ -o report.md
+
+  # Сравнение версий
+  pbix2owl diff -s v1.json -t v2.json -f changelog
+  ```
 
 #### 13. Collaborative Ontology Review
 - **Приоритет**: LOW
