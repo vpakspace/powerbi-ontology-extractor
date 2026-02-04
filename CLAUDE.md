@@ -372,8 +372,38 @@ python -m powerbi_ontology.cli extract --input sample.pbix --output ontology.owl
 
 ---
 
+## История сессий
+
+### 2026-02-04 — Завершение всех задач + README обновлён
+
+**Выполнено**:
+- ✅ Task 10: Multi-Dashboard Semantic Debt Analysis (fix type errors)
+- ✅ Task 11: Ontology Diff Tool (Git-like diff and merge)
+- ✅ Task 12: CLI Batch Processing (`pbix2owl` command)
+- ✅ Task 13: Collaborative Ontology Review (workflow + comments)
+- ✅ README.md обновлён с новыми фичами (секции 9-12)
+- ✅ README.md запушен на GitHub
+
+**Коммиты**:
+- `1fea703` — fix: Resolve type error in semantic_debt.py summary field
+- `001a1d1` — feat: Add Ontology Diff Tool with Git-like diff and merge
+- `13558aa` — feat: Add CLI batch processing with pbix2owl command
+- `354382e` — feat: Add Collaborative Ontology Review workflow
+- `d896a3d` — chore: Update project memory with completed tasks
+- `418c1a3` — chore: Update tests count and coverage in CLAUDE.md
+- `e08bf8c` — docs: Update README with new features (Diff, Review, CLI)
+
+**Статистика**:
+- 340 тестов passing
+- 82% coverage
+- 13/13 задач завершено
+- GitHub: https://github.com/vpakspace/powerbi-ontology-extractor
+
+---
+
 ## Связанные проекты
 
 - **OntoGuard AI**: `~/ontoguard-ai/` — Semantic Firewall for AI Agents
 - **Universal Agent Connector**: `~/universal-agent-connector/` — MCP Infrastructure + Streamlit UI
 - **Original repo**: https://github.com/pankajkumar/powerbi-ontology-extractor
+- **GitHub fork**: https://github.com/vpakspace/powerbi-ontology-extractor
