@@ -185,10 +185,10 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 
 #### 9. ✅ Visual Ontology Editor (no-code UI)
 - **Статус**: Завершено
-- **Файл**: `ontology_editor.py` (750+ строк)
+- **Файл**: `ontology_editor.py` (950+ строк)
 - **Технология**: Streamlit
 - **Реализовано**:
-  - [x] **6 вкладок**: Load/Create, Entities, Relationships, Permissions, Business Rules, OWL Preview
+  - [x] **7 вкладок**: Load/Create, Entities, Relationships, Permissions, Business Rules, OWL Preview, **Diff & Merge**
   - [x] Загрузка из .pbix файлов и JSON
   - [x] Редактирование entities с properties
   - [x] Редактирование relationships между entities
@@ -197,11 +197,15 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
   - [x] Preview OWL с summary statistics
   - [x] Экспорт в JSON и OWL форматы
   - [x] Constraints: range, regex, enum
+  - [x] **Diff & Merge** (добавлено 2026-02-04):
+    - Загрузка второй онтологии для сравнения
+    - Run Diff: changelog с added/removed/modified
+    - Run Merge: стратегии union/ours/theirs
+    - Semantic Debt Analysis: обнаружение конфликтов
+    - Use Merged as Current: применить результат
 - **Запуск**:
   ```bash
   streamlit run ontology_editor.py --server.port 8503
-  # или
-  ./run_editor.sh
   ```
 - **Пример**: `examples/sample_ontology.json`
 
@@ -483,10 +487,18 @@ python -m powerbi_ontology.cli <command> [options]
 | analyze | 3 conflicts |
 | diff | 136 changes |
 
+**Новая фича: Diff & Merge в UI**:
+- Добавлена 7-я вкладка в Streamlit UI
+- Загрузка второй онтологии (JSON/.pbix)
+- Run Diff, Run Merge, Semantic Debt Analysis
+- Стратегии: union, ours, theirs
+
 **Коммиты**:
 - `7b652c8` — fix: Prevent infinite rerun loop when loading .pbix in Streamlit UI
 - `ca716fa` — docs: Update project memory with debugging results
 - `972c43f` — docs: Add Adventure Works test results
+- `0f2ddfc` — docs: Add CLI test results
+- `5b6a783` — feat: Add Diff & Merge tab to Streamlit UI
 
 ---
 
