@@ -581,6 +581,43 @@ python -m powerbi_ontology.cli <command> [options]
 
 ## История сессий
 
+### 2026-02-04 (ночь) — Ontology Chat с AI (Task 14) ✅
+
+**Выполнено**:
+- ✅ **Task 14: Ontology Chat** — AI-чат для вопросов по .pbix данным
+  - Фаза 1 (MVP): класс `OntologyChat` в `powerbi_ontology/chat.py`
+  - Фаза 2 (UI): 8-я вкладка "💬 Chat" в Streamlit
+- ✅ Интеграция OpenAI API (gpt-4o-mini)
+- ✅ Формирование контекста из онтологии (entities, relationships, measures, rules)
+- ✅ Выбор роли (Admin/Analyst/Viewer)
+- ✅ Предложенные вопросы на основе данных
+- ✅ Билингвальная поддержка (русский/английский)
+- ✅ README.md полностью переписан
+
+**Тестирование чата (Playwright)**:
+
+| Онтология | Вопрос | Результат |
+|-----------|--------|-----------|
+| Sales_Returns_Sample | "Какие entities есть в онтологии?" | ✅ Список 15 entities с properties |
+| Sales_Returns_Sample | "Покажи все relationships между entities" | ✅ Таблица 9 связей |
+| Adventure_Works_DW_2020 | "Describe the data model structure" | ✅ Подробное описание 11 entities |
+
+**Новые файлы**:
+- `powerbi_ontology/chat.py` — 303 строки (OntologyChat, ChatSession, ChatMessage)
+- `.env` — конфигурация OPENAI_API_KEY
+
+**Коммиты**:
+- `139075c` — feat: Add Ontology Chat with OpenAI integration
+- `21270d2` — docs: Update project memory with completed Ontology Chat feature
+- `861fd91` — docs: Complete README rewrite with full project documentation
+
+**Статистика проекта**:
+- 14/14 задач завершено
+- 340 тестов, 82% coverage
+- 8 вкладок в Streamlit UI
+
+---
+
 ### 2026-02-04 (вечер) — Отладка Streamlit UI + Тестирование обоих .pbix файлов ✅
 
 **Выполнено**:
@@ -657,7 +694,7 @@ python -m powerbi_ontology.cli <command> [options]
 **Статистика**:
 - 340 тестов passing
 - 82% coverage
-- 13/13 задач завершено
+- 14/14 задач завершено
 - GitHub: https://github.com/vpakspace/powerbi-ontology-extractor
 
 ---
