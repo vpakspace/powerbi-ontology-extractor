@@ -12,6 +12,7 @@ from powerbi_ontology.ontology_generator import OntologyGenerator, Ontology
 from powerbi_ontology.analyzer import SemanticAnalyzer
 from powerbi_ontology.contract_builder import ContractBuilder
 from powerbi_ontology.schema_mapper import SchemaMapper
+from powerbi_ontology.semantic_debt import SemanticDebtAnalyzer, SemanticDebtReport, analyze_ontologies
 
 __all__ = [
     "PowerBIExtractor",
@@ -21,4 +22,7 @@ __all__ = [
     "SemanticAnalyzer",
     "ContractBuilder",
     "SchemaMapper",
+    "SemanticDebtAnalyzer",
+    "SemanticDebtReport",
+    "analyze_ontologies",
 ]
