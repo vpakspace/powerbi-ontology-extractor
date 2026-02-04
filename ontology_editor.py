@@ -14,9 +14,15 @@ Run: streamlit run ontology_editor.py
 
 import json
 import tempfile
+import os
 from pathlib import Path
+from datetime import datetime
 
 import streamlit as st
+
+# Storage directory for auto-saved ontologies
+STORAGE_DIR = Path(__file__).parent / "data" / "ontologies"
+STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 from powerbi_ontology.ontology_generator import (
     Ontology,
@@ -58,6 +64,57 @@ def init_session_state():
         st.session_state.diff_report = None
     if "merged_ontology" not in st.session_state:
         st.session_state.merged_ontology = None
+
+
+def get_safe_filename(name: str) -> str:
+    """Convert ontology name to safe filename."""
+    # Replace unsafe characters
+    safe = name.replace(" ", "_").replace("/", "_").replace("\\", "_")
+    safe = "".join(c for c in safe if c.isalnum() or c in "_-.")
+    return safe[:100]  # Limit length
+
+
+def autosave_ontology(ontology: Ontology) -> Path:
+    """Auto-save ontology to storage directory. Returns path to saved file."""
+    safe_name = get_safe_filename(ontology.name)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{safe_name}_{timestamp}.json"
+    filepath = STORAGE_DIR / filename
+
+    # Convert ontology to JSON-serializable dict
+    data = ontology_to_dict(ontology)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    return filepath
+
+
+def get_recent_ontologies(limit: int = 10) -> list:
+    """Get list of recently saved ontologies, sorted by modification time."""
+    files = []
+    for f in STORAGE_DIR.glob("*.json"):
+        try:
+            stat = f.stat()
+            files.append({
+                "path": f,
+                "name": f.stem,
+                "modified": datetime.fromtimestamp(stat.st_mtime),
+                "size": stat.st_size,
+            })
+        except OSError:
+            continue
+
+    # Sort by modification time, newest first
+    files.sort(key=lambda x: x["modified"], reverse=True)
+    return files[:limit]
+
+
+def load_from_storage(filepath: Path) -> Ontology:
+    """Load ontology from storage file."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return load_ontology_from_json(data)
 
 
 def create_empty_ontology(name: str) -> Ontology:
@@ -248,6 +305,11 @@ def render_sidebar():
 
         st.sidebar.divider()
 
+        # Autosave button
+        if st.sidebar.button("💾 Save to History", use_container_width=True):
+            filepath = autosave_ontology(ont)
+            st.sidebar.success(f"Saved: {filepath.name}")
+
         if st.sidebar.button("🗑️ Clear Ontology", use_container_width=True, type="secondary"):
             st.session_state.ontology = None
             st.session_state.selected_entity = None
@@ -255,6 +317,30 @@ def render_sidebar():
             st.rerun()
     else:
         st.sidebar.info("No ontology loaded. Create or import one.")
+
+    # Recent ontologies section
+    st.sidebar.divider()
+    st.sidebar.subheader("📚 Recent Ontologies")
+
+    recent = get_recent_ontologies(limit=5)
+    if recent:
+        for item in recent:
+            col1, col2 = st.sidebar.columns([3, 1])
+            with col1:
+                # Truncate long names
+                display_name = item["name"][:25] + "..." if len(item["name"]) > 25 else item["name"]
+                st.caption(f"📄 {display_name}")
+                st.caption(f"   {item['modified'].strftime('%m/%d %H:%M')}")
+            with col2:
+                if st.button("📂", key=f"load_{item['path'].name}", help=f"Load {item['name']}"):
+                    try:
+                        st.session_state.ontology = load_from_storage(item["path"])
+                        st.session_state.loaded_file = None  # Reset tracking
+                        st.rerun()
+                    except Exception as e:
+                        st.sidebar.error(f"Error: {e}")
+    else:
+        st.sidebar.caption("No saved ontologies yet")
 
 
 def render_load_tab():
