@@ -234,26 +234,48 @@ flowchart LR
 - ✅ Mermaid diagram export
 - ✅ Export to PNG, SVG, PDF
 
-### 9. CLI Tool for Automation
+### 9. Visual Ontology Editor (Streamlit)
+- ✅ No-code UI for ontology editing
+- ✅ Load from .pbix files or JSON
+- ✅ Edit entities, properties, relationships
+- ✅ Permission matrix (RBAC)
+- ✅ Business rules with classification
+- ✅ OWL preview and export
+- ✅ Run: `streamlit run ontology_editor.py`
+
+### 10. Ontology Diff & Merge
+- ✅ Git-like diff between ontology versions
+- ✅ Detect added/removed/modified elements
+- ✅ Generate changelogs (Markdown)
+- ✅ Three-way merge (base, ours, theirs)
+- ✅ Conflict detection and resolution
+
+### 11. Collaborative Review Workflow
+- ✅ Comments on entities/properties/rules
+- ✅ Reply and resolve threads
+- ✅ Approval workflow (draft → review → approved → published)
+- ✅ Audit trail of all actions
+- ✅ Markdown review reports
+
+### 12. CLI Tool for Automation
 ```bash
-# Extract ontology
-pbi-ontology extract dashboard.pbix --output ontology.json
+# Install CLI
+pip install -e .
 
-# Analyze multiple dashboards
-pbi-ontology analyze *.pbix --report semantic_debt.html
+# Extract ontology from single .pbix file
+pbix2owl extract -i dashboard.pbix -o ontology.owl --format owl
 
-# Export to different formats
-pbi-ontology export ontology.json --format fabric-iq --output fabric.json
-pbi-ontology export ontology.json --format ontoguard --output ontoguard.json
+# Batch process directory of .pbix files (8 parallel workers)
+pbix2owl batch -i ./dashboards/ -o ./ontologies/ -w 8 --recursive
 
-# Validate schema bindings
-pbi-ontology validate ontology.json --schema database_schema.json
+# Analyze semantic debt across multiple ontologies
+pbix2owl analyze -i ./ontologies/ -o report.md --format markdown
 
-# Visualize ontology
-pbi-ontology visualize ontology.json --output diagram.png --interactive
+# Compare two ontology versions (diff)
+pbix2owl diff -s v1.json -t v2.json -o changelog.md --format changelog
 
-# Batch process
-pbi-ontology batch --input-dir ./dashboards/ --output-dir ./ontologies/
+# Available formats: owl, json, markdown, changelog
+# CLI commands: extract, batch, analyze, diff
 ```
 
 ## 📚 Documentation
