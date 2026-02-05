@@ -48,6 +48,9 @@ dependencies = [
     "rdflib>=6.3.0",
     "jsonschema>=4.17.0",
     "pyyaml>=6.0",
+    "pbixray>=0.5.0",
+    "fastmcp>=0.1.0",
+    "openai>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -64,17 +67,21 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cloudbadal007/powerbi-ontology-extractor"
-Documentation = "https://github.com/cloudbadal007/powerbi-ontology-extractor#readme"
-Repository = "https://github.com/cloudbadal007/powerbi-ontology-extractor"
-Issues = "https://github.com/cloudbadal007/powerbi-ontology-extractor/issues"
-Changelog = "https://github.com/cloudbadal007/powerbi-ontology-extractor/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/vpakspace/powerbi-ontology-extractor"
+Documentation = "https://github.com/vpakspace/powerbi-ontology-extractor#readme"
+Repository = "https://github.com/vpakspace/powerbi-ontology-extractor"
+Issues = "https://github.com/vpakspace/powerbi-ontology-extractor/issues"
+Changelog = "https://github.com/vpakspace/powerbi-ontology-extractor/blob/main/CHANGELOG.md"
 
 [project.scripts]
-pbi-ontology = "cli.pbi_ontology_cli:main"
+pbi-ontology = "powerbi_ontology.cli:main"
+pbix2owl = "powerbi_ontology.cli:main"
+powerbi-ontology-mcp = "powerbi_ontology.mcp_server:main"
 
-[tool.setuptools]
-packages = ["powerbi_ontology", "cli"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["powerbi_ontology*", "cli*"]
+exclude = ["tests*", "examples*", "docs*"]
 
 [tool.black]
 line-length = 88
