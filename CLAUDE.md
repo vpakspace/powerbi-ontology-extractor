@@ -648,10 +648,29 @@ python -m powerbi_ontology.cli <command> [options]
 - `2c0fa42` — feat: Publish to PyPI v0.1.0
 - `81e1cce` — docs: Update README with pip install and MCP Server section
 - `c6a1e1d` — docs: Improve MCP setup instructions
+- `35756ae` — docs: Update project memory with PyPI publication
 
 **Размер пакета**:
 - `.whl`: 92 KB
 - `.tar.gz`: 14 MB (включает sample .pbix файлы)
+
+**Тест в чистом окружении** ✅:
+```bash
+python -m venv /tmp/test-powerbi-ontology
+source /tmp/test-powerbi-ontology/bin/activate
+pip install powerbi-ontology-extractor
+```
+
+| Этап | Результат |
+|------|-----------|
+| Создание чистого venv | ✅ |
+| `pip install powerbi-ontology-extractor` | ✅ 92 KB wheel + 113 зависимостей |
+| Импорт `mcp_server` | ✅ |
+| Импорт `OWLExporter` | ✅ |
+| Импорт `OntologyChat` | ✅ |
+| CLI `pbix2owl --help` | ✅ 4 команды доступны |
+
+**Основные зависимости установлены**: `fastmcp`, `rdflib`, `pbixray`, `openai`, `pydantic`, `pandas`, `networkx`
 
 **Установка для пользователей**:
 ```bash
