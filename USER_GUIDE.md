@@ -62,7 +62,17 @@ pip install -e .
 
 ### Шаг 2: Настройка Claude Code
 
-Добавьте конфигурацию MCP сервера в файл `~/.claude.json`:
+Откройте файл `~/.claude.json` в текстовом редакторе:
+
+```bash
+# Linux/macOS
+nano ~/.claude.json
+
+# Или через код
+code ~/.claude.json
+```
+
+Добавьте секцию `powerbi-ontology` в `mcpServers`:
 
 ```json
 {
@@ -71,9 +81,7 @@ pip install -e .
       "type": "stdio",
       "command": "python",
       "args": ["-m", "powerbi_ontology.mcp_server"],
-      "cwd": "/path/to/powerbi-ontology-extractor",
       "env": {
-        "POWERBI_MCP_CONFIG": "config/mcp_config.yaml",
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
       }
     }
@@ -81,7 +89,28 @@ pip install -e .
 }
 ```
 
-**Важно:** Замените `/path/to/powerbi-ontology-extractor` на реальный путь к папке проекта.
+**Примечание:** Если у вас уже есть другие MCP серверы, просто добавьте `"powerbi-ontology": {...}` внутрь существующего `mcpServers`.
+
+**Пример с несколькими серверами:**
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "powerbi-ontology": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "powerbi_ontology.mcp_server"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
 
 ### Шаг 3: Перезапуск Claude Code
 

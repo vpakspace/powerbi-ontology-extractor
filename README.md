@@ -386,16 +386,14 @@ pip install powerbi-ontology-extractor
 {
   "mcpServers": {
     "powerbi-ontology": {
-      "type": "stdio",
       "command": "python",
-      "args": ["-m", "powerbi_ontology.mcp_server"],
-      "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      }
+      "args": ["-m", "powerbi_ontology.mcp_server"]
     }
   }
 }
 ```
+
+> **Optional**: Add `"env": {"OPENAI_API_KEY": "..."}` for AI chat feature.
 
 3. **Restart Claude Code**
 
