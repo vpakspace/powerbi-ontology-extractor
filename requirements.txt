@@ -27,3 +27,6 @@ pyyaml>=6.0
 # AI Chat
 openai>=1.0.0
 python-dotenv>=1.0.0
+
+# MCP Server
+fastmcp>=0.1.0

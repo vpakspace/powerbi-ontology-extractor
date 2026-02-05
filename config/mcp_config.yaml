@@ -1,0 +1,44 @@
+# MCP Server Configuration for PowerBI Ontology Extractor
+#
+# This configuration file controls the behavior of the MCP server
+# when accessed by AI agents through Claude Code or other MCP clients.
+
+server:
+  name: "PowerBI Ontology Extractor MCP"
+  version: "0.1.0"
+  description: "Extract semantic intelligence from Power BI files via MCP"
+
+# Logging configuration
+log_level: INFO  # DEBUG, INFO, WARNING, ERROR
+
+# Extraction defaults
+extraction:
+  include_measures: true       # Extract DAX measures
+  include_security: true       # Extract RLS rules
+  cleanup_temp: true           # Clean up temp files after extraction
+  max_file_size_mb: 100        # Maximum .pbix file size
+
+# OWL Export defaults
+export:
+  default_format: "xml"        # xml, turtle, json-ld, n3
+  include_action_rules: true   # Generate OntoGuard-compatible action rules
+  include_constraints: true    # Generate OWL restrictions for constraints
+  default_roles:               # Default roles for action rules
+    - Admin
+    - Analyst
+    - Viewer
+
+# Semantic debt analysis
+analysis:
+  similarity_threshold: 0.8    # Threshold for name similarity matching (0-1)
+
+# Chat configuration (requires OPENAI_API_KEY)
+chat:
+  model: "gpt-4o-mini"         # OpenAI model
+  temperature: 0.3             # Lower = more factual
+  max_tokens: 1000             # Maximum response length
+
+# Cache settings
+cache:
+  enabled: true
+  ttl_seconds: 3600            # Cache TTL for extracted models

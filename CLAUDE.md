@@ -581,6 +581,48 @@ python -m powerbi_ontology.cli <command> [options]
 
 ## История сессий
 
+### 2026-02-05 — MCP Server (Task 15) ✅
+
+**Выполнено**:
+- ✅ **Task 15: MCP Server** — превращение проекта в MCP сервер для AI агентов
+  - Phase 1: Core Infrastructure (FastMCP, config loader, YAML config)
+  - Phase 2: Generation & Export (pbix_extract, ontology_generate, export_owl, export_json)
+  - Phase 3: Analysis Tools (analyze_debt, ontology_diff, ontology_merge)
+  - Phase 4: Chat Integration (ontology_chat_ask)
+  - Phase 5: Testing & Integration (30 тестов, регистрация в ~/.claude.json)
+
+**Созданные файлы**:
+- `powerbi_ontology/mcp_server.py` — 600+ строк (8 MCP tools)
+- `powerbi_ontology/mcp_config.py` — 238 строк (MCPConfig class)
+- `powerbi_ontology/mcp_models.py` — 167 строк (dataclass models)
+- `config/mcp_config.yaml` — 48 строк (configuration)
+- `tests/test_mcp_server.py` — 800+ строк (30 tests)
+
+**MCP Tools**:
+| Tool | Описание |
+|------|----------|
+| `pbix_extract` | Извлечение semantic model из .pbix |
+| `ontology_generate` | Генерация онтологии из model data |
+| `export_owl` | Экспорт в OWL (xml/turtle/json-ld/n3) |
+| `export_json` | Экспорт в JSON |
+| `analyze_debt` | Анализ семантического долга |
+| `ontology_diff` | Сравнение версий онтологий |
+| `ontology_merge` | Слияние онтологий (three-way) |
+| `ontology_chat_ask` | AI Q&A по онтологии |
+
+**Тесты**: 30 passed (pytest)
+
+**Claude Code Integration**:
+- Добавлен в `~/.claude.json` → `mcpServers.powerbi-ontology`
+- Требуется restart Claude Code для активации
+
+**Статистика проекта**:
+- **15/15 задач завершено**
+- 370 тестов (340 + 30 MCP)
+- 17 MCP серверов в Claude Code (+1)
+
+---
+
 ### 2026-02-04 (ночь) — Ontology Chat с AI (Task 14) ✅
 
 **Выполнено**:
@@ -696,6 +738,118 @@ python -m powerbi_ontology.cli <command> [options]
 - 82% coverage
 - 14/14 задач завершено
 - GitHub: https://github.com/vpakspace/powerbi-ontology-extractor
+
+---
+
+## ✅ Task 15: MCP Server
+
+**Статус**: Завершено
+**Цель**: Превратить проект в MCP сервер для AI агентов
+
+### Архитектура
+
+```
+┌─────────────────────────────────────────────────┐
+│  MCP Server (FastMCP "PowerBI-Ontology")        │
+├─────────────────────────────────────────────────┤
+│  Tools (8):                                     │
+│  - pbix_extract          - analyze_debt         │
+│  - ontology_generate     - ontology_diff        │
+│  - export_owl            - ontology_merge       │
+│  - export_json           - ontology_chat_ask    │
+└─────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────┐
+│  Existing Modules (powerbi_ontology/)           │
+│  - extractor.py → PowerBIExtractor              │
+│  - ontology_generator.py → OntologyGenerator    │
+│  - export/owl.py → OWLExporter                  │
+│  - semantic_debt.py → SemanticDebtAnalyzer      │
+│  - ontology_diff.py → OntologyDiff/Merge        │
+│  - chat.py → OntologyChat                       │
+└─────────────────────────────────────────────────┘
+```
+
+### MCP Tools
+
+| Tool | Input | Output | Описание |
+|------|-------|--------|----------|
+| `pbix_extract` | pbix_path | model_data | Извлечение модели из .pbix |
+| `ontology_generate` | model_data | ontology_data | Генерация онтологии |
+| `export_owl` | ontology_data, format | owl_content | Экспорт в OWL |
+| `export_json` | ontology_data | json_content | Экспорт в JSON |
+| `analyze_debt` | ontologies (dict) | report | Анализ конфликтов |
+| `ontology_diff` | source, target | diff_report | Сравнение версий |
+| `ontology_merge` | base, ours, theirs | merged | Слияние версий |
+| `ontology_chat_ask` | question, ontology | answer | AI Q&A |
+
+### Созданные файлы
+
+| Файл | Описание | Статус |
+|------|----------|--------|
+| `powerbi_ontology/mcp_server.py` | Main MCP server (600+ строк) | ✅ |
+| `powerbi_ontology/mcp_config.py` | Config loader (238 строк) | ✅ |
+| `powerbi_ontology/mcp_models.py` | Pydantic models (167 строк) | ✅ |
+| `config/mcp_config.yaml` | Configuration (48 строк) | ✅ |
+| `tests/test_mcp_server.py` | Tests (30 тестов, 800+ строк) | ✅ |
+
+### План реализации
+
+#### Phase 1: Core Infrastructure ✅
+- [x] Create `mcp_server.py` with FastMCP initialization
+- [x] Create `mcp_config.py` for YAML config loading
+- [x] Create `config/mcp_config.yaml`
+- [x] Implement `pbix_extract` tool
+
+#### Phase 2: Generation & Export ✅
+- [x] Implement `ontology_generate` tool
+- [x] Implement `export_owl` tool
+- [x] Implement `export_json` tool
+
+#### Phase 3: Analysis Tools ✅
+- [x] Implement `analyze_debt` tool
+- [x] Implement `ontology_diff` tool
+- [x] Implement `ontology_merge` tool
+
+#### Phase 4: Chat Integration ✅
+- [x] Implement `ontology_chat_ask` tool
+
+#### Phase 5: Testing & Integration ✅
+- [x] Write tests (30 passed)
+- [x] Register in `~/.claude.json`
+- [x] E2E testing (pipeline verified)
+
+### Зависимости
+
+```
+# Добавить в requirements.txt
+fastmcp>=0.1.0
+```
+
+### Claude Code Integration
+
+```json
+// ~/.claude.json
+{
+  "mcpServers": {
+    "powerbi-ontology": {
+      "command": "python",
+      "args": ["-m", "powerbi_ontology.mcp_server"],
+      "cwd": "/home/vladspace_ubuntu24/powerbi-ontology-extractor",
+      "env": {
+        "POWERBI_MCP_CONFIG": "config/mcp_config.yaml",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### Референс
+
+- **OntoGuard MCP**: `~/ontoguard-ai/src/ontoguard/mcp_server.py` — FastMCP паттерн
+- **FastMCP docs**: https://github.com/jlowin/fastmcp
 
 ---
 
