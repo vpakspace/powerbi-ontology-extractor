@@ -10,6 +10,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-82%25-green)](https://github.com/vpakspace/powerbi-ontology-extractor)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://img.shields.io/pypi/v/powerbi-ontology-extractor.svg)](https://pypi.org/project/powerbi-ontology-extractor/)
 
 [Installation](#installation) • [Quick Start](#-quick-start) • [Features](#-key-features) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
@@ -62,12 +63,15 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 ### Installation
 
 ```bash
-# Clone repository
+# Install from PyPI (recommended)
+pip install powerbi-ontology-extractor
+```
+
+**Or install from source:**
+
+```bash
 git clone https://github.com/vpakspace/powerbi-ontology-extractor.git
 cd powerbi-ontology-extractor
-
-# Install dependencies
-pip install -r requirements.txt
 pip install -e .
 ```
 
@@ -321,6 +325,7 @@ powerbi-ontology-extractor/
 │   ├── review.py              # Collaborative review
 │   ├── chat.py                # AI Chat (OpenAI)
 │   ├── cli.py                 # CLI commands
+│   ├── mcp_server.py          # MCP Server for Claude Code
 │   ├── export/
 │   │   ├── owl.py             # OWL/RDF export
 │   │   ├── fabric_iq.py       # Fabric IQ export
@@ -355,10 +360,70 @@ powerbi-ontology-extractor/
 | Ontology Diff & Merge | ✅ Complete | 84% |
 | Review Workflow | ✅ Complete | 93% |
 | CLI Tool | ✅ Complete | 60% |
+| MCP Server (Claude Code) | ✅ Complete | 85% |
 | Visual Editor (Streamlit) | ✅ Complete | - |
 | AI Chat (OpenAI) | ✅ Complete | - |
 
-**Overall**: 340 tests, 82% coverage
+**Overall**: 370 tests, 82% coverage
+
+**PyPI**: https://pypi.org/project/powerbi-ontology-extractor/
+
+---
+
+## 🤖 MCP Server (Claude Code Integration)
+
+Use PowerBI Ontology Extractor directly in Claude Code via MCP protocol.
+
+### Setup
+
+1. **Install the package**:
+```bash
+pip install powerbi-ontology-extractor
+```
+
+2. **Add to `~/.claude.json`**:
+```json
+{
+  "mcpServers": {
+    "powerbi-ontology": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "powerbi_ontology.mcp_server"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+3. **Restart Claude Code**
+
+### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `pbix_extract` | Extract semantic model from .pbix file |
+| `ontology_generate` | Generate ontology from model data |
+| `export_owl` | Export to OWL format (xml/turtle) |
+| `export_json` | Export to JSON format |
+| `analyze_debt` | Analyze semantic debt across ontologies |
+| `ontology_diff` | Compare two ontology versions |
+| `ontology_merge` | Merge ontologies (three-way) |
+| `ontology_chat_ask` | AI Q&A about ontology |
+
+### Usage Examples in Claude Code
+
+```
+# Extract and generate ontology
+"Extract ontology from sales.pbix and export to OWL"
+
+# Ask questions about ontology
+"What entities are in the Sales_Returns ontology?"
+
+# Compare versions
+"Compare v1 and v2 ontologies and show differences"
+```
 
 ---
 
