@@ -2,7 +2,9 @@
 
 **Миссия**: Извлечь скрытые онтологии из 20+ миллионов Power BI дашбордов и сделать их доступными для AI-агентов.
 
-**Репозиторий**: Клонирован из https://github.com/pankajkumar/powerbi-ontology-extractor
+**PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ ⭐ NEW
+**GitHub**: https://github.com/vpakspace/powerbi-ontology-extractor
+**Установка**: `pip install powerbi-ontology-extractor`
 
 ---
 
@@ -623,6 +625,54 @@ python -m powerbi_ontology.cli <command> [options]
 
 ---
 
+### 2026-02-05 — Публикация на PyPI ⭐ NEW
+
+**Выполнено**:
+- ✅ **Публикация на PyPI**: https://pypi.org/project/powerbi-ontology-extractor/
+- ✅ **Установка через pip**: `pip install powerbi-ontology-extractor`
+- ✅ **USER_GUIDE.md** создан (575 строк):
+  - Инструкция по установке MCP сервера
+  - Описание 8 вкладок Streamlit UI
+  - Список 8 MCP tools
+  - FAQ и Troubleshooting
+- ✅ **README.md обновлён**:
+  - PyPI badge добавлен
+  - pip install как основной способ установки
+  - Секция MCP Server с инструкцией для Claude Code
+- ✅ **pyproject.toml обновлён**:
+  - Правильные URLs (vpakspace)
+  - Добавлены pbixray, fastmcp, openai в dependencies
+  - Entry points: `pbix2owl`, `pbi-ontology`, `powerbi-ontology-mcp`
+
+**Коммиты**:
+- `2c0fa42` — feat: Publish to PyPI v0.1.0
+- `81e1cce` — docs: Update README with pip install and MCP Server section
+- `c6a1e1d` — docs: Improve MCP setup instructions
+
+**Размер пакета**:
+- `.whl`: 92 KB
+- `.tar.gz`: 14 MB (включает sample .pbix файлы)
+
+**Установка для пользователей**:
+```bash
+# 1. Установить пакет
+pip install powerbi-ontology-extractor
+
+# 2. Добавить в ~/.claude.json
+{
+  "mcpServers": {
+    "powerbi-ontology": {
+      "command": "python",
+      "args": ["-m", "powerbi_ontology.mcp_server"]
+    }
+  }
+}
+
+# 3. Перезапустить Claude Code
+```
+
+---
+
 ### 2026-02-04 (ночь) — Ontology Chat с AI (Task 14) ✅
 
 **Выполнено**:
@@ -835,16 +885,13 @@ fastmcp>=0.1.0
   "mcpServers": {
     "powerbi-ontology": {
       "command": "python",
-      "args": ["-m", "powerbi_ontology.mcp_server"],
-      "cwd": "/home/vladspace_ubuntu24/powerbi-ontology-extractor",
-      "env": {
-        "POWERBI_MCP_CONFIG": "config/mcp_config.yaml",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      }
+      "args": ["-m", "powerbi_ontology.mcp_server"]
     }
   }
 }
 ```
+
+**Примечание**: После `pip install powerbi-ontology-extractor` не нужен `cwd` — Python найдёт модуль автоматически.
 
 ### Референс
 
@@ -855,7 +902,8 @@ fastmcp>=0.1.0
 
 ## Связанные проекты
 
+- **PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ ⭐
+- **GitHub**: https://github.com/vpakspace/powerbi-ontology-extractor
 - **OntoGuard AI**: `~/ontoguard-ai/` — Semantic Firewall for AI Agents
 - **Universal Agent Connector**: `~/universal-agent-connector/` — MCP Infrastructure + Streamlit UI
 - **Original repo**: https://github.com/pankajkumar/powerbi-ontology-extractor
-- **GitHub fork**: https://github.com/vpakspace/powerbi-ontology-extractor
