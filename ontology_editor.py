@@ -13,6 +13,7 @@ Run: streamlit run ontology_editor.py
 """
 
 import json
+import logging
 import tempfile
 import secrets
 import os
@@ -22,8 +23,22 @@ from datetime import datetime
 
 import streamlit as st
 
+# Audit logger for tracking user operations
+audit_logger = logging.getLogger("ontology_editor.audit")
+if not audit_logger.handlers:
+    _log_dir = Path(__file__).parent / "data"
+    _log_dir.mkdir(parents=True, exist_ok=True)
+    _handler = logging.FileHandler(str(_log_dir / "audit.log"), encoding="utf-8")
+    _handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+    audit_logger.addHandler(_handler)
+    audit_logger.setLevel(logging.INFO)
+
 # Security constants
 MAX_PBIX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_CHAT_HISTORY = 50  # Maximum chat messages to retain in session
+
+# Default roles (single source of truth for the editor)
+DEFAULT_ROLES = ["Admin", "Analyst", "Viewer"]
 
 # Storage directory for auto-saved ontologies
 STORAGE_DIR = Path(__file__).parent / "data" / "ontologies"
@@ -100,7 +115,7 @@ def init_session_state():
     if "permissions" not in st.session_state:
         st.session_state.permissions = {}
     if "roles" not in st.session_state:
-        st.session_state.roles = ["Admin", "Analyst", "Viewer"]
+        st.session_state.roles = list(DEFAULT_ROLES)
     if "loaded_file" not in st.session_state:
         st.session_state.loaded_file = None  # Track loaded file to prevent re-processing
     if "compare_ontology" not in st.session_state:
@@ -347,6 +362,7 @@ def render_sidebar():
         if st.sidebar.button("📥 Export OWL", use_container_width=True):
             exporter = OWLExporter(ont, default_roles=st.session_state.roles)
             owl_content = exporter.export(format="xml")
+            audit_logger.info(f"OWL exported: {ont.name} ({len(owl_content)} bytes)")
             st.sidebar.download_button(
                 "Download OWL",
                 owl_content,
@@ -360,6 +376,7 @@ def render_sidebar():
         # Autosave button
         if st.sidebar.button("💾 Save to History", use_container_width=True):
             filepath = autosave_ontology(ont)
+            audit_logger.info(f"Ontology saved: {ont.name} → {filepath.name}")
             st.sidebar.success(f"Saved: {filepath.name}")
 
         if st.sidebar.button("🗑️ Clear Ontology", use_container_width=True, type="secondary"):
@@ -460,9 +477,11 @@ def render_load_tab():
 
                         # Mark file as loaded to prevent re-processing
                         st.session_state.loaded_file = file_key
+                        audit_logger.info(f"PBIX uploaded: {uploaded_pbix.name} ({uploaded_pbix.size} bytes)")
                         st.success(f"✅ Extracted ontology from {uploaded_pbix.name}")
                         st.rerun()
                     except Exception as e:
+                        audit_logger.warning(f"PBIX upload failed: {uploaded_pbix.name} — {e}")
                         st.error(f"Error extracting from PBIX: {e}")
                     finally:
                         if temp_path:
@@ -504,6 +523,7 @@ def render_entities_tab():
                         constraints=[],
                     ))
                     st.session_state.selected_entity = new_entity_name
+                    audit_logger.info(f"Entity added: {new_entity_name} (type={new_entity_type})")
                     st.success(f"Added entity: {new_entity_name}")
                     st.rerun()
                 else:
@@ -662,6 +682,7 @@ def render_entity_editor(entity: OntologyEntity):
     st.divider()
     if st.button("🗑️ Delete Entity", type="secondary"):
         ont = st.session_state.ontology
+        audit_logger.info(f"Entity deleted: {entity.name}")
         ont.entities = [e for e in ont.entities if e.name != entity.name]
         ont.relationships = [
             r for r in ont.relationships
@@ -1288,6 +1309,10 @@ OPENAI_API_KEY=sk-your-actual-key-here
                 except Exception as e:
                     error_msg = f"Error: {str(e)}"
                     st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
+
+            # Trim chat history to prevent memory leak
+            if len(st.session_state.chat_history) > MAX_CHAT_HISTORY:
+                st.session_state.chat_history = st.session_state.chat_history[-MAX_CHAT_HISTORY:]
 
             st.rerun()
 

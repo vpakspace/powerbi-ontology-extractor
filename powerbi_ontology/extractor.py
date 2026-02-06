@@ -345,17 +345,21 @@ class PowerBIExtractor:
     def _extract_measure_dependencies(self, dax_formula: str) -> List[str]:
         """
         Extract table/column dependencies from DAX formula (basic implementation).
-        
+
         This is a simplified version - full parsing is done in dax_parser.py
         """
-        dependencies = []
-        # Simple regex-based extraction (enhanced in dax_parser)
         import re
-        # Match table[column] patterns
-        pattern = r'(\w+)\[(\w+)\]'
-        matches = re.findall(pattern, dax_formula)
+        # Strip string literals and line comments to avoid false positives
+        cleaned = re.sub(r'"[^"]*"', '', dax_formula)  # remove "string" literals
+        cleaned = re.sub(r'//[^\n]*', '', cleaned)       # remove // line comments
+        cleaned = re.sub(r'/\*.*?\*/', '', cleaned, flags=re.DOTALL)  # remove /* block comments */
+
+        dependencies = []
+        # Match table[column] patterns (supports spaces in table names via quotes)
+        pattern = r"'?(\w[\w ]*)'?\[(\w+)\]"
+        matches = re.findall(pattern, cleaned)
         for table, column in matches:
-            dependencies.append(f"{table}.{column}")
+            dependencies.append(f"{table.strip()}.{column}")
         return list(set(dependencies))
 
     def __enter__(self):
