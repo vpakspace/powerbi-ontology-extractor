@@ -583,6 +583,47 @@ python -m powerbi_ontology.cli <command> [options]
 
 ## История сессий
 
+### 2026-02-06 — Security Code Review (Opus 4.6) ✅
+
+**Выполнено**: Полный аудит безопасности и качества кода с Claude Opus 4.6
+
+**Обнаружено 14 проблем** → **14 исправлено** (100%):
+
+| Severity | # | Проблема | Исправление | Файл |
+|----------|---|----------|-------------|------|
+| **CRITICAL** | 1 | API key в .env | `.gitignore` уже защищал; создан `.env.example` | `.env.example` |
+| **CRITICAL** | 2 | Path traversal в ZIP | `validate_pbix_upload()` — проверка архива | `ontology_editor.py` |
+| **CRITICAL** | 3 | DAX injection в OWL | `_sanitize_dax()` — очистка перед RDF | `export/owl.py` |
+| **HIGH** | 4 | Нет path validation в MCP | `_validate_file_path()` + `allowed_paths` конфиг | `mcp_server.py` |
+| **HIGH** | 5 | Race condition temp файлы | `secrets.token_hex` + `os.O_EXCL` + `0o600` | `ontology_editor.py` |
+| **MEDIUM** | 6 | Hardcoded roles | `DEFAULT_ROLES` константа | `ontology_editor.py` |
+| **MEDIUM** | 7 | Нет audit logging | `audit_logger` в upload/export/entity/save ops | `ontology_editor.py` |
+| **MEDIUM** | 8 | Примитивный DAX regex | Strip строк/комментариев + `'Table'[Col]` | `extractor.py` |
+| **MEDIUM** | 9 | Unbounded chat_history | `MAX_CHAT_HISTORY=50` + auto-trim | `ontology_editor.py` |
+| **LOW** | 10 | Неиспользуемые импорты | Удалены 7 unused imports | `mcp_server.py`, `ontology_editor.py` |
+| **LOW** | 11 | Missing type hints | `TYPE_CHECKING` + return annotations | `mcp_server.py`, `chat.py`, `owl.py` |
+| **LOW** | 12 | Non-deterministic hash() | `hashlib.md5` для Streamlit widget keys | `ontology_editor.py` |
+| **LOW** | 13 | Нет rate limiting для chat | Throttle 1 req/sec в `OntologyChat.ask()` | `chat.py` |
+| **LOW** | 14 | Слабые docstrings | Расширены docstrings helpers | `mcp_server.py`, `owl.py` |
+
+**Коммиты**:
+- `0f9ca61` — fix: Address 3 critical security issues found by code review
+- `ff7b2f0` — fix: Address HIGH security issues — path validation and temp file hardening
+- `f0f13fb` — fix: Address MEDIUM issues — audit logging, DAX regex, chat history, default roles
+- `c184e35` — chore: Address LOW issues — unused imports, type hints, rate limiting, docstrings
+
+**Security-hardened компоненты**:
+- **Загрузка .pbix**: валидация размера, ZIP-структуры, path traversal
+- **MCP Server**: `allowed_paths` whitelist в `config/mcp_config.yaml`
+- **OWL Export**: DAX sanitization (null bytes, semicolons, length limit 10K)
+- **Temp файлы**: unpredictable names + exclusive create + restrictive permissions
+- **Audit trail**: `data/audit.log` с timestamps для всех мутирующих операций
+- **Chat**: rate limiting + bounded history
+
+**Тесты**: 370 passed, coverage 81%
+
+---
+
 ### 2026-02-05 — MCP Server (Task 15) ✅
 
 **Выполнено**:
@@ -619,8 +660,8 @@ python -m powerbi_ontology.cli <command> [options]
 - Требуется restart Claude Code для активации
 
 **Статистика проекта**:
-- **15/15 задач завершено**
-- 370 тестов (340 + 30 MCP)
+- **15/15 задач завершено** + security code review (14/14 issues fixed)
+- 370 тестов (340 + 30 MCP), coverage 81%
 - 17 MCP серверов в Claude Code (+1)
 
 ---
