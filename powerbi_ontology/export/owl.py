@@ -6,10 +6,13 @@ Enhanced with action rules, constraints, and RLS support for OntoGuard integrati
 """
 
 import logging
+import re
 from typing import Optional, List
 
 from rdflib import Graph, Namespace, Literal, URIRef, BNode
 from rdflib.namespace import RDF, RDFS, OWL, XSD
+
+MAX_DAX_LENGTH = 10000
 
 from powerbi_ontology.ontology_generator import (
     Ontology,
@@ -360,9 +363,10 @@ class OWLExporter:
             entity_uri = self.ont[self._safe_name(rule.entity)]
             self.graph.add((rule_instance, self.ont.appliesTo, entity_uri))
 
-        # Add condition as annotation
+        # Add condition as annotation (sanitized — may contain DAX expressions)
         if rule.condition:
-            self.graph.add((rule_instance, self.ont.condition, Literal(rule.condition)))
+            safe_condition = self._sanitize_dax(rule.condition)
+            self.graph.add((rule_instance, self.ont.condition, Literal(safe_condition)))
 
         # Add action as annotation
         if rule.action:
@@ -439,8 +443,9 @@ class OWLExporter:
             # Link to role
             self.graph.add((rls_uri, self.ont.requiresRole, role_uri))
 
-            # Add DAX filter
-            self.graph.add((rls_uri, dax_filter_prop, Literal(rule.dax_filter)))
+            # Add DAX filter (sanitized to prevent injection in SQL-based triple stores)
+            safe_dax = self._sanitize_dax(rule.dax_filter)
+            self.graph.add((rls_uri, dax_filter_prop, Literal(safe_dax)))
 
             # Add description
             if hasattr(rule, 'description') and rule.description:
@@ -464,6 +469,27 @@ class OWLExporter:
             "Binary": XSD.base64Binary,
         }
         return type_mapping.get(data_type, XSD.string)
+
+    @staticmethod
+    def _sanitize_dax(expression: str) -> str:
+        """
+        Sanitize DAX expression for safe storage in OWL.
+
+        Removes null bytes and semicolons that could be exploited
+        if the OWL is loaded into SQL-based triple stores.
+        Truncates to MAX_DAX_LENGTH.
+        """
+        if not expression:
+            return ""
+        # Remove null bytes and semicolons (potential SQL injection vectors)
+        sanitized = re.sub(r'[\x00;]', '', expression)
+        # Limit length
+        if len(sanitized) > MAX_DAX_LENGTH:
+            logger.warning(
+                f"DAX expression truncated from {len(sanitized)} to {MAX_DAX_LENGTH} chars"
+            )
+            sanitized = sanitized[:MAX_DAX_LENGTH]
+        return sanitized
 
     def _safe_name(self, name: str) -> str:
         """Convert name to URI-safe format."""

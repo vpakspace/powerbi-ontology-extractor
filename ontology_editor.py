@@ -15,14 +15,53 @@ Run: streamlit run ontology_editor.py
 import json
 import tempfile
 import os
+import zipfile
 from pathlib import Path
 from datetime import datetime
 
 import streamlit as st
 
+# Security constants
+MAX_PBIX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+
 # Storage directory for auto-saved ontologies
 STORAGE_DIR = Path(__file__).parent / "data" / "ontologies"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def validate_pbix_upload(uploaded_file) -> str | None:
+    """
+    Validate uploaded .pbix file for security.
+
+    Returns None if valid, or an error message string.
+    """
+    # Check file size
+    uploaded_file.seek(0, os.SEEK_END)
+    size = uploaded_file.tell()
+    uploaded_file.seek(0)
+
+    if size > MAX_PBIX_FILE_SIZE:
+        return f"File too large: {size / (1024*1024):.1f} MB (max {MAX_PBIX_FILE_SIZE // (1024*1024)} MB)"
+
+    if size == 0:
+        return "File is empty"
+
+    # Validate ZIP structure (.pbix is a ZIP archive)
+    try:
+        with zipfile.ZipFile(uploaded_file) as zf:
+            for name in zf.namelist():
+                # Reject path traversal attempts
+                if name.startswith('/') or '..' in name:
+                    return f"Rejected: suspicious path in archive: {name}"
+                # Reject absolute Windows paths
+                if len(name) > 1 and name[1] == ':':
+                    return f"Rejected: absolute path in archive: {name}"
+    except zipfile.BadZipFile:
+        return "Invalid .pbix file: not a valid ZIP archive"
+    finally:
+        uploaded_file.seek(0)
+
+    return None
 
 from powerbi_ontology.ontology_generator import (
     Ontology,
@@ -393,32 +432,37 @@ def render_load_tab():
             if st.session_state.loaded_file == file_key:
                 st.info(f"✅ Already loaded: {uploaded_pbix.name}")
             else:
-                temp_path = None
-                try:
-                    # Save to temp file
-                    with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
-                        f.write(uploaded_pbix.read())
-                        temp_path = f.name
+                # Validate uploaded file before processing
+                validation_error = validate_pbix_upload(uploaded_pbix)
+                if validation_error:
+                    st.error(f"Upload rejected: {validation_error}")
+                else:
+                    temp_path = None
+                    try:
+                        # Save to temp file
+                        with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
+                            f.write(uploaded_pbix.read())
+                            temp_path = f.name
 
-                    # Try to extract
-                    from powerbi_ontology.extractor import PowerBIExtractor
-                    from powerbi_ontology.ontology_generator import OntologyGenerator
+                        # Try to extract
+                        from powerbi_ontology.extractor import PowerBIExtractor
+                        from powerbi_ontology.ontology_generator import OntologyGenerator
 
-                    with st.spinner(f"Extracting {uploaded_pbix.name}..."):
-                        extractor = PowerBIExtractor(temp_path)
-                        semantic_model = extractor.extract()
-                        generator = OntologyGenerator(semantic_model)
-                        st.session_state.ontology = generator.generate()
+                        with st.spinner(f"Extracting {uploaded_pbix.name}..."):
+                            extractor = PowerBIExtractor(temp_path)
+                            semantic_model = extractor.extract()
+                            generator = OntologyGenerator(semantic_model)
+                            st.session_state.ontology = generator.generate()
 
-                    # Mark file as loaded to prevent re-processing
-                    st.session_state.loaded_file = file_key
-                    st.success(f"✅ Extracted ontology from {uploaded_pbix.name}")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error extracting from PBIX: {e}")
-                finally:
-                    if temp_path:
-                        Path(temp_path).unlink(missing_ok=True)
+                        # Mark file as loaded to prevent re-processing
+                        st.session_state.loaded_file = file_key
+                        st.success(f"✅ Extracted ontology from {uploaded_pbix.name}")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error extracting from PBIX: {e}")
+                    finally:
+                        if temp_path:
+                            Path(temp_path).unlink(missing_ok=True)
 
 
 def render_entities_tab():
