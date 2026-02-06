@@ -38,6 +38,17 @@ chat:
   temperature: 0.3             # Lower = more factual
   max_tokens: 1000             # Maximum response length
 
+# Security settings
+security:
+  # Allowed directories for file access (pbix_extract, export_json)
+  # If empty, allows access to any path (default for backward compatibility)
+  # Set these to restrict file access to specific directories
+  allowed_paths: []
+  # Example:
+  # allowed_paths:
+  #   - /home/user/dashboards
+  #   - /data/powerbi
+
 # Cache settings
 cache:
   enabled: true

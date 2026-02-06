@@ -14,6 +14,7 @@ Run: streamlit run ontology_editor.py
 
 import json
 import tempfile
+import secrets
 import os
 import zipfile
 from pathlib import Path
@@ -439,10 +440,13 @@ def render_load_tab():
                 else:
                     temp_path = None
                     try:
-                        # Save to temp file
-                        with tempfile.NamedTemporaryFile(suffix=".pbix", delete=False) as f:
+                        # Save to temp file with unpredictable name and restrictive permissions
+                        temp_dir = Path(tempfile.gettempdir())
+                        temp_name = f"pbix_{secrets.token_hex(16)}.pbix"
+                        temp_path = str(temp_dir / temp_name)
+                        fd = os.open(temp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                        with os.fdopen(fd, 'wb') as f:
                             f.write(uploaded_pbix.read())
-                            temp_path = f.name
 
                         # Try to extract
                         from powerbi_ontology.extractor import PowerBIExtractor

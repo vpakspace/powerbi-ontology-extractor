@@ -70,6 +70,41 @@ mcp = FastMCP("PowerBI-Ontology")
 
 
 # ============================================================================
+# Security helpers
+# ============================================================================
+
+def _validate_file_path(file_path: str, must_exist: bool = True) -> Optional[str]:
+    """
+    Validate a file path against allowed directories.
+
+    Returns None if path is valid, or an error message string.
+    Prevents path traversal and restricts access to configured directories.
+    """
+    try:
+        resolved = Path(file_path).resolve()
+    except (ValueError, OSError) as e:
+        return f"Invalid path: {e}"
+
+    # Block path traversal patterns in the raw input
+    if '..' in file_path:
+        return f"Path traversal not allowed: {file_path}"
+
+    # Check against allowed_paths (if configured)
+    allowed = config.allowed_paths
+    if allowed:
+        if not any(str(resolved).startswith(str(Path(p).resolve())) for p in allowed):
+            return (
+                f"Access denied: {resolved} is outside allowed directories. "
+                f"Configure security.allowed_paths in mcp_config.yaml"
+            )
+
+    if must_exist and not resolved.exists():
+        return f"File not found: {file_path}"
+
+    return None
+
+
+# ============================================================================
 # Helper functions
 # ============================================================================
 
@@ -333,13 +368,12 @@ def _pbix_extract_impl(
     try:
         from powerbi_ontology.extractor import PowerBIExtractor
 
-        # Validate file exists
-        path = Path(pbix_path)
-        if not path.exists():
-            return ExtractResult(
-                success=False,
-                error=f"File not found: {pbix_path}"
-            ).to_dict()
+        # Validate path security
+        path_error = _validate_file_path(pbix_path, must_exist=True)
+        if path_error:
+            return ExtractResult(success=False, error=path_error).to_dict()
+
+        path = Path(pbix_path).resolve()
 
         if not path.suffix.lower() == ".pbix":
             return ExtractResult(
@@ -674,7 +708,12 @@ def _export_json_impl(
         json_content = json.dumps(ontology_data, indent=2, ensure_ascii=False)
 
         if output_path:
-            path = Path(output_path)
+            # Validate output path security
+            path_error = _validate_file_path(output_path, must_exist=False)
+            if path_error:
+                return ExportJSONResult(success=False, error=path_error).to_dict()
+
+            path = Path(output_path).resolve()
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json_content, encoding="utf-8")
             logger.info(f"Saved JSON to: {output_path}")

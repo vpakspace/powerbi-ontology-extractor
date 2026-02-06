@@ -40,6 +40,9 @@ DEFAULT_CONFIG = {
         "temperature": 0.3,
         "max_tokens": 1000,
     },
+    "security": {
+        "allowed_paths": [],
+    },
     "cache": {
         "enabled": True,
         "ttl_seconds": 3600,
@@ -190,6 +193,11 @@ class MCPConfig:
     @property
     def chat_max_tokens(self) -> int:
         return self._config["chat"]["max_tokens"]
+
+    # Security settings
+    @property
+    def allowed_paths(self) -> List[str]:
+        return self._config.get("security", {}).get("allowed_paths", [])
 
     # Cache settings
     @property
