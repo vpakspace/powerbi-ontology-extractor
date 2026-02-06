@@ -497,13 +497,13 @@ class OWLExporter:
             return "unnamed"
         return name.replace(" ", "_").replace("-", "_").replace(".", "_")
 
-    def save(self, filepath: str, format: str = "xml"):
+    def save(self, filepath: str, format: str = "xml") -> None:
         """
         Save OWL export to file.
 
         Args:
-            filepath: Path to save file
-            format: Output format
+            filepath: Path to save file (UTF-8 encoded)
+            format: Output format (xml, turtle, json-ld, n3)
         """
         output = self.export(format=format)
         with open(filepath, 'w', encoding='utf-8') as f:

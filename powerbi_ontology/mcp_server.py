@@ -24,12 +24,17 @@ Usage:
     }
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os
-import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from powerbi_ontology.extractor import SemanticModel
+    from powerbi_ontology.ontology_generator import Ontology
 
 try:
     from fastmcp import FastMCP
@@ -38,7 +43,7 @@ except ImportError:
         "fastmcp is required for MCP server. Install with: pip install fastmcp"
     )
 
-from powerbi_ontology.mcp_config import get_config, reload_config
+from powerbi_ontology.mcp_config import get_config
 from powerbi_ontology.mcp_models import (
     ExtractResult,
     GenerateResult,
@@ -48,8 +53,6 @@ from powerbi_ontology.mcp_models import (
     DiffResult,
     MergeResult,
     ChatResult,
-    ExportFormat,
-    MergeStrategy,
 )
 
 # Configure logging
@@ -108,8 +111,12 @@ def _validate_file_path(file_path: str, must_exist: bool = True) -> Optional[str
 # Helper functions
 # ============================================================================
 
-def _semantic_model_to_dict(model) -> Dict[str, Any]:
-    """Convert SemanticModel to dictionary."""
+def _semantic_model_to_dict(model: SemanticModel) -> Dict[str, Any]:
+    """Convert SemanticModel to a JSON-serializable dictionary.
+
+    Serializes entities, relationships, measures, hierarchies,
+    security rules, and metadata from the extracted Power BI model.
+    """
     return {
         "name": model.name,
         "source_file": model.source_file,
@@ -179,8 +186,12 @@ def _semantic_model_to_dict(model) -> Dict[str, Any]:
     }
 
 
-def _ontology_to_dict(ontology) -> Dict[str, Any]:
-    """Convert Ontology to dictionary."""
+def _ontology_to_dict(ontology: Ontology) -> Dict[str, Any]:
+    """Convert Ontology to a JSON-serializable dictionary.
+
+    Serializes entities (with properties and constraints), relationships,
+    business rules, and metadata for MCP transport or JSON export.
+    """
     return {
         "name": ontology.name,
         "version": ontology.version,
@@ -243,7 +254,7 @@ def _ontology_to_dict(ontology) -> Dict[str, Any]:
     }
 
 
-def _dict_to_ontology(data: Dict[str, Any]):
+def _dict_to_ontology(data: Dict[str, Any]) -> Ontology:
     """Convert dictionary to Ontology object."""
     from powerbi_ontology.ontology_generator import (
         Ontology,

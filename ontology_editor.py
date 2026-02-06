@@ -12,6 +12,7 @@ A Streamlit-based GUI for:
 Run: streamlit run ontology_editor.py
 """
 
+import hashlib
 import json
 import logging
 import tempfile
@@ -89,9 +90,9 @@ from powerbi_ontology.ontology_generator import (
 )
 from powerbi_ontology.export.owl import OWLExporter
 from powerbi_ontology.contract_builder import ContractBuilder
-from powerbi_ontology.ontology_diff import OntologyDiff, OntologyMerge, diff_ontologies
+from powerbi_ontology.ontology_diff import OntologyDiff, OntologyMerge
 from powerbi_ontology.semantic_debt import SemanticDebtAnalyzer
-from powerbi_ontology.chat import OntologyChat, create_chat
+from powerbi_ontology.chat import create_chat
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -1247,7 +1248,8 @@ OPENAI_API_KEY=sk-your-actual-key-here
         st.subheader("💡 Suggestions")
         suggestions = chat.get_suggestions(ont)
         for suggestion in suggestions[:4]:
-            if st.button(suggestion[:30] + "..." if len(suggestion) > 30 else suggestion, key=f"sug_{hash(suggestion)}"):
+            sug_key = hashlib.md5(suggestion.encode("utf-8")).hexdigest()[:8]
+            if st.button(suggestion[:30] + "..." if len(suggestion) > 30 else suggestion, key=f"sug_{sug_key}"):
                 st.session_state.pending_question = suggestion
 
         # Clear history button

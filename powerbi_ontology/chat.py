@@ -5,10 +5,14 @@ Allows users to ask questions about loaded ontologies in natural language.
 Uses OpenAI API (or compatible) to generate answers based on ontology context.
 """
 
+import logging
 import os
-from typing import Optional, List, Dict
+import time
+from typing import Any, Optional, List, Dict
 from dataclasses import dataclass, field
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 from .ontology_generator import Ontology
 
@@ -39,7 +43,7 @@ class ChatSession:
         recent = self.messages[-limit:] if limit else self.messages
         return [{"role": m.role, "content": m.content} for m in recent]
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear chat history."""
         self.messages.clear()
 
@@ -96,8 +100,10 @@ class OntologyChat:
         self.base_url = base_url or os.getenv("OLLAMA_BASE_URL")
         self._client = None
         self.session = ChatSession()
+        self._last_request_time: float = 0.0
+        self._min_request_interval: float = 1.0  # seconds between API calls
 
-    def _get_client(self):
+    def _get_client(self) -> Any:
         """Lazy load OpenAI client."""
         if self._client is None:
             try:
@@ -227,6 +233,13 @@ class OntologyChat:
         messages.append({"role": "user", "content": question})
 
         try:
+            # Rate limiting: enforce minimum interval between requests
+            now = time.monotonic()
+            elapsed = now - self._last_request_time
+            if elapsed < self._min_request_interval:
+                time.sleep(self._min_request_interval - elapsed)
+            self._last_request_time = time.monotonic()
+
             # Call OpenAI API
             response = client.chat.completions.create(
                 model=self.model,
@@ -281,7 +294,7 @@ class OntologyChat:
 
         return suggestions[:6]  # Limit to 6 suggestions
 
-    def clear_history(self):
+    def clear_history(self) -> None:
         """Clear chat history."""
         self.session.clear()
 
