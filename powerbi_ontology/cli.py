@@ -47,7 +47,7 @@ def setup_logging(verbose: bool):
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="pbix2owl")
+@click.version_option(version="0.1.1", prog_name="pbix2owl")
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose output")
 def cli(verbose: bool):
     """PowerBI Ontology Extractor - Extract semantic intelligence from Power BI files."""
