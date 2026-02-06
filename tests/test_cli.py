@@ -89,7 +89,7 @@ class TestCLIHelp:
         """Test version command."""
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
-        assert "0.1.0" in result.output
+        assert "0.1.1" in result.output
 
     def test_extract_help(self, runner):
         """Test extract command help."""
