@@ -37,9 +37,11 @@ ENV/
 # Testing
 .pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
 .tox/
 .hypothesis/
+test_output.json
 
 # Jupyter
 .ipynb_checkpoints/
