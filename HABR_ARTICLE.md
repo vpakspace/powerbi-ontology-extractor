@@ -51,6 +51,12 @@ pip install powerbi-ontology-extractor
 
 Всё. Ни Docker, ни конфигурации серверов, ни платных API (кроме опционального OpenAI для чата). Одна команда — и у вас есть CLI, Python API и Streamlit UI.
 
+### Идейная основа
+
+PowerBI Ontology Extractor переводит семантическую модель Power BI в явный онтологический артефакт — то, что можно запрашивать, валидировать, версионировать и использовать как «семантический контракт» для AI-агентов. Отправная идея здесь — линия статей [Pankaj Kumar](#ссылки): в корпоративном масштабе BI-модели фактически являются неформальными онтологиями, которые можно формализовать и превратить в инфраструктурный актив.
+
+Практическая ценность — в надёжности. Когда смысл вынесен наружу, становятся возможны проверки «по смыслу», а не только «по схеме»: например, контроль бизнес-логики и более безопасные изменения модели при дрейфе полей и имён. Это хорошо стыкуется с идеями Kumar про семантическую валидацию ([OntoGuard](https://github.com/vpakspace/ontoguard-ai)) и прод-инфраструктуру для агентов на стыке MCP и онтологий ([Universal Agent Connector](https://github.com/vpakspace/universal-agent-connector)).
+
 ---
 
 ## Что под капотом
@@ -333,13 +339,17 @@ $ pytest
 
 ---
 
-## Roadmap
+## Об авторстве и Roadmap
 
-Проект активно развивается. Ближайшие планы:
+Фреймворк сильно переработан архитектурно относительно оригинальной концепции Kumar, но названия сущностей и смысловых блоков я осознанно оставил «как у автора» — чтобы читателю было проще сопоставлять с первоисточниками и не терять нить контекста.
 
+Проект активно развивается. Ближайшие шаги:
+
+- **Извлечение более богатых ограничений** — в духе SHACL-валидаций, чтобы выразить не только типы, но и бизнес-инварианты (диапазоны, зависимости между полями)
+- **Анализ влияния изменений** — diff между версиями моделей с оценкой того, какие агенты и пайплайны затронуты
+- **Стандартизация упаковки онтологий** — для рантаймов агентных систем (MCP-совместимый формат, версионирование артефактов)
 - **v0.2.0**: Поддержка Power BI Semantic Link (прямое подключение к Fabric)
 - **v0.3.0**: Автоматическая генерация Semantic Contract с property-level permissions
-- **v0.4.0**: Визуальный граф онтологии (D3.js / Plotly)
 - **v1.0.0**: Production-ready с CI/CD, Docker image, Helm chart
 
 ---
@@ -366,3 +376,21 @@ streamlit run ontology_editor.py
 ---
 
 *Если проект полезен — поставьте звезду на GitHub. Если есть вопросы или идеи — открывайте Issues, мы отвечаем.*
+
+---
+
+## Ссылки
+
+### Серия статей Pankaj Kumar (идейная основа)
+
+1. [Microsoft vs Palantir: Two Paths to Enterprise Ontology](https://medium.com/@cloudpankaj/microsoft-vs-palantir-two-paths-to-enterprise-ontology-and-why-microsofts-bet-on-semantic-6e72265dce21)
+2. [The Power BI Ontology Paradox](https://medium.com/@cloudpankaj/the-power-bi-ontology-paradox-how-20-million-dashboards-became-microsofts-secret-weapon-for-5585e7d18c01)
+3. [From Power BI Dashboard to AI Agent in 30 Minutes](https://medium.com/@cloudpankaj/from-power-bi-dashboard-to-ai-agent-in-30-minutes-i-built-the-tool-that-unlocks-20-million-hidden-500e59bd91df)
+4. [Universal Agent Connector: MCP + Ontology](https://medium.com/@cloudpankaj/universal-agent-connector-mcp-ontology-production-ready-ai-infrastructure-0b4e35f22942)
+5. [OntoGuard: Ontology Firewall for AI Agents](https://medium.com/@cloudpankaj/ontoguard-i-built-an-ontology-firewall-for-ai-agents-in-48-hours-using-cursor-ai-be4208c405e7)
+
+### Проекты
+
+- [PowerBI Ontology Extractor](https://github.com/vpakspace/powerbi-ontology-extractor) — этот проект
+- [OntoGuard AI](https://github.com/vpakspace/ontoguard-ai) — семантический файрвол для AI-агентов
+- [Universal Agent Connector](https://github.com/vpakspace/universal-agent-connector) — MCP-инфраструктура для подключения агентов к БД
