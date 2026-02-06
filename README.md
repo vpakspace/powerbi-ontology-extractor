@@ -6,8 +6,9 @@
 
 **Transform 20 million Power BI dashboards into AI-ready ontologies**
 
-[![Tests](https://img.shields.io/badge/tests-340%20passed-brightgreen)](https://github.com/vpakspace/powerbi-ontology-extractor)
-[![Coverage](https://img.shields.io/badge/coverage-82%25-green)](https://github.com/vpakspace/powerbi-ontology-extractor)
+[![Tests](https://img.shields.io/badge/tests-370%20passed-brightgreen)](https://github.com/vpakspace/powerbi-ontology-extractor)
+[![Coverage](https://img.shields.io/badge/coverage-81%25-green)](https://github.com/vpakspace/powerbi-ontology-extractor)
+[![Security](https://img.shields.io/badge/security-hardened-blue)](https://github.com/vpakspace/powerbi-ontology-extractor)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://img.shields.io/pypi/v/powerbi-ontology-extractor.svg)](https://pypi.org/project/powerbi-ontology-extractor/)
@@ -189,18 +190,38 @@ pbix2owl analyze -i ./ontologies/ -o report.md
 pbix2owl diff -s v1.json -t v2.json -o changelog.md
 ```
 
-### 10. AI-Powered Ontology Chat 🆕
+### 10. AI-Powered Ontology Chat
 - ✅ Ask questions about loaded ontology in natural language
 - ✅ OpenAI API integration (gpt-4o-mini)
 - ✅ Role-based context (Admin/Analyst/Viewer)
 - ✅ Bilingual support (Russian/English)
 - ✅ Suggested questions based on ontology content
+- ✅ Rate limiting (1 req/sec) to prevent API abuse
 
 **Example questions**:
 - "What entities exist in the ontology?"
 - "How are Customer and Sales related?"
 - "Show all DAX measures"
 - "What permissions does Analyst role have?"
+
+### 11. Security Hardened (v0.1.1)
+
+14 security issues identified and fixed via comprehensive code review:
+
+| Severity | Count | Examples |
+|----------|-------|---------|
+| **CRITICAL** | 3 | Path traversal in file operations, XSS in chat rendering, unsafe YAML loading |
+| **HIGH** | 2 | API key validation, file upload size limits (50 MB) |
+| **MEDIUM** | 4 | Audit logging, DAX regex hardening, error info leakage prevention |
+| **LOW** | 5 | Type hints, deterministic hashing, rate limiting, unused code cleanup |
+
+**Security features**:
+- Path traversal protection on all file write operations
+- HTML escaping for chat messages (XSS prevention)
+- PBIX upload validation (size + extension + ZIP structure)
+- Audit trail logging for all mutating operations (`data/audit.log`)
+- OpenAI API key validation before external calls
+- Rate limiting on AI chat requests
 
 ---
 
@@ -292,7 +313,7 @@ fabric_json = exporter.export()
 ## 🧪 Testing
 
 ```bash
-# Run all tests (340 tests, 82% coverage)
+# Run all tests (370 tests, 81% coverage)
 pytest
 
 # Run with coverage report
@@ -303,10 +324,11 @@ pytest tests/test_owl_exporter.py -v
 ```
 
 **Test Statistics**:
-- 340 tests passing
-- 82% code coverage
+- 370 tests passing
+- 81% code coverage
 - E2E tests with real .pbix files
 - OntoGuard integration tests
+- MCP Server tests (30 tests)
 
 ---
 
@@ -318,27 +340,32 @@ powerbi-ontology-extractor/
 │   ├── __init__.py
 │   ├── extractor.py           # PowerBIExtractor
 │   ├── ontology_generator.py  # OntologyGenerator
-│   ├── pbix_reader.py         # PBIXRay integration
 │   ├── dax_parser.py          # DAX formula parsing
 │   ├── semantic_debt.py       # Multi-dashboard analysis
 │   ├── ontology_diff.py       # Diff & Merge
 │   ├── review.py              # Collaborative review
-│   ├── chat.py                # AI Chat (OpenAI)
+│   ├── chat.py                # AI Chat (OpenAI, rate-limited)
 │   ├── cli.py                 # CLI commands
 │   ├── mcp_server.py          # MCP Server for Claude Code
+│   ├── mcp_config.py          # MCP configuration loader
+│   ├── mcp_models.py          # MCP data models
 │   ├── export/
-│   │   ├── owl.py             # OWL/RDF export
+│   │   ├── owl.py             # OWL/RDF export (path-validated)
 │   │   ├── fabric_iq.py       # Fabric IQ export
 │   │   ├── fabric_iq_to_owl.py
 │   │   └── contract_to_owl.py
 │   └── utils/
+│       ├── pbix_reader.py     # PBIXRay integration
 │       ├── visualizer.py
 │       └── validators.py
+├── config/
+│   └── mcp_config.yaml        # MCP server configuration
 ├── ontology_editor.py         # Streamlit UI (1300+ lines)
 ├── examples/
 │   ├── sample_pbix/           # Microsoft official samples
 │   └── sample_ontology.json
-├── tests/                     # 340 tests
+├── tests/                     # 370 tests, 81% coverage
+├── pyproject.toml
 ├── requirements.txt
 └── README.md
 ```
@@ -364,7 +391,9 @@ powerbi-ontology-extractor/
 | Visual Editor (Streamlit) | ✅ Complete | - |
 | AI Chat (OpenAI) | ✅ Complete | - |
 
-**Overall**: 370 tests, 82% coverage
+**Overall**: 370 tests, 81% coverage
+
+**Current version**: [0.1.1](https://pypi.org/project/powerbi-ontology-extractor/0.1.1/) (security patch)
 
 **PyPI**: https://pypi.org/project/powerbi-ontology-extractor/
 
@@ -500,15 +529,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Ready to unlock the semantic intelligence in your Power BI dashboards?** 🚀
+**Ready to unlock the semantic intelligence in your Power BI dashboards?**
 
 ```bash
-git clone https://github.com/vpakspace/powerbi-ontology-extractor.git
-cd powerbi-ontology-extractor
-pip install -r requirements.txt
-streamlit run ontology_editor.py
+pip install powerbi-ontology-extractor
 ```
 
-**Star ⭐ this repo if you find it useful!**
+**Star this repo if you find it useful!**
 
 </div>
