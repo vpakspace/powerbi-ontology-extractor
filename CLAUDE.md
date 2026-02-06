@@ -2,8 +2,9 @@
 
 **Миссия**: Извлечь скрытые онтологии из 20+ миллионов Power BI дашбордов и сделать их доступными для AI-агентов.
 
-**PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ ⭐ NEW
+**PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ (v0.1.1)
 **GitHub**: https://github.com/vpakspace/powerbi-ontology-extractor
+**Release**: https://github.com/vpakspace/powerbi-ontology-extractor/releases/tag/v0.1.1
 **Установка**: `pip install powerbi-ontology-extractor`
 
 ---
@@ -583,9 +584,9 @@ python -m powerbi_ontology.cli <command> [options]
 
 ## История сессий
 
-### 2026-02-06 — Security Code Review (Opus 4.6) ✅
+### 2026-02-06 — Security Code Review + v0.1.1 Release ✅
 
-**Выполнено**: Полный аудит безопасности и качества кода с Claude Opus 4.6
+**Выполнено**: Полный аудит безопасности и качества кода с Claude Opus 4.6, публикация v0.1.1 на PyPI и GitHub Release
 
 **Обнаружено 14 проблем** → **14 исправлено** (100%):
 
@@ -621,6 +622,18 @@ python -m powerbi_ontology.cli <command> [options]
 - **Chat**: rate limiting + bounded history
 
 **Тесты**: 370 passed, coverage 81%
+
+**Релиз v0.1.1** (security patch):
+- ✅ Version bump: 0.1.0 → 0.1.1 (`__init__.py`, `setup.py`, `pyproject.toml`)
+- ✅ PyPI: https://pypi.org/project/powerbi-ontology-extractor/0.1.1/
+- ✅ GitHub Release: https://github.com/vpakspace/powerbi-ontology-extractor/releases/tag/v0.1.1
+- ✅ README.md обновлён: секция "Security Hardened", badges (370 tests, 81% coverage, security)
+- ✅ `.gitignore` обновлён: добавлены `coverage.xml`, `test_output.json`
+
+**Коммиты релиза**:
+- `856bfd1` — chore: bump version to 0.1.1 for security patch release
+- `dd36480` — docs: update README with security section, fix badges and project structure
+- `42885d2` — chore: add test artifacts to .gitignore
 
 ---
 
@@ -666,7 +679,7 @@ python -m powerbi_ontology.cli <command> [options]
 
 ---
 
-### 2026-02-05 — Публикация на PyPI ⭐ NEW
+### 2026-02-05 — Публикация на PyPI v0.1.0
 
 **Выполнено**:
 - ✅ **Публикация на PyPI**: https://pypi.org/project/powerbi-ontology-extractor/
@@ -962,7 +975,8 @@ fastmcp>=0.1.0
 
 ## Связанные проекты
 
-- **PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ ⭐
+- **PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ (v0.1.1)
+- **GitHub Release**: https://github.com/vpakspace/powerbi-ontology-extractor/releases/tag/v0.1.1
 - **GitHub**: https://github.com/vpakspace/powerbi-ontology-extractor
 - **OntoGuard AI**: `~/ontoguard-ai/` — Semantic Firewall for AI Agents
 - **Universal Agent Connector**: `~/universal-agent-connector/` — MCP Infrastructure + Streamlit UI
