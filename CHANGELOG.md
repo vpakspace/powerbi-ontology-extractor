@@ -34,8 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Core Functionality
 - **PBIX Reader**: Extract semantic models from Power BI .pbix files (ZIP-based format)
 - **PowerBI Extractor**: Extract entities, relationships, measures, hierarchies, and security rules
-- **DAX Parser**: Parse DAX formulas and convert to structured business rules
-  - Support for CALCULATE, IF, SWITCH statements
+- **DAX Subset Parser**: Regex-based parser for 4 DAX patterns (not full DAX grammar)
+  - Support for CALCULATE (single-level), IF, SWITCH, simple thresholds
   - Dependency identification
   - Measure type classification (aggregation, conditional, filter, time intelligence)
 - **Ontology Generator**: Convert Power BI semantic models to formal ontologies

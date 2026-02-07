@@ -111,14 +111,26 @@ class DAXParser:
 
     def extract_business_logic(self, measure_name: str, dax_formula: str) -> List[BusinessRule]:
         """
-        Extract business logic from DAX formula.
-        
+        Extract business logic from a DAX formula using regex-based subset parsing.
+
+        This is a **subset parser** — it recognises 4 DAX patterns via regex,
+        not the full DAX grammar:
+
+          1. CALCULATE(expr, filter)  — single-level only
+          2. IF(condition, true, false)
+          3. SWITCH(TRUE(), condition, value, …)
+          4. Simple thresholds  (field > value)
+
+        **Not supported**: nested CALCULATE (inner level), VAR/RETURN blocks,
+        row-context iterators (SUMX, FILTER), table constructors,
+        SELECTEDVALUE, HASONEVALUE, time-intelligence functions (SAMEPERIODLASTYEAR, etc.).
+
         Args:
             measure_name: Name of the measure
             dax_formula: DAX formula string
-            
+
         Returns:
-            List of BusinessRule objects
+            List of BusinessRule objects extracted from recognised patterns
         """
         rules = []
         dax_upper = dax_formula.upper()

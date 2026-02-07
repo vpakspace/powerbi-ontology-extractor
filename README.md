@@ -356,7 +356,7 @@ python evaluation/run_evaluation.py
 | Sales_Returns_Sample | 100% | 100% | 100% | 9 |
 | Adventure_Works_DW_2020 | 100% | 100% | 100% | 13 |
 
-### DAX Parser Pattern Coverage
+### DAX Subset Parser — Pattern Coverage
 
 **8/8** patterns handled correctly (100%):
 
@@ -378,9 +378,9 @@ python evaluation/run_evaluation.py
 | Sales_Returns_Sample | 1,656 | 32 | 117 ms |
 | Adventure_Works_DW_2020 | 1,083 | 0 | 73 ms |
 
-### DAX Parser Limitations (documented)
+### DAX Subset Parser — Limitations
 
-The regex-based DAX parser handles 4 core patterns. **Not supported**: nested CALCULATE (inner level), row context (SUMX/FILTER iterators), table constructors, SELECTEDVALUE, HASONEVALUE, and other advanced DAX patterns. See `evaluation/run_evaluation.py` for details.
+The regex-based DAX **subset** parser handles 4 core patterns. **Not supported**: nested CALCULATE (inner level), row context (SUMX/FILTER iterators), table constructors, SELECTEDVALUE, HASONEVALUE, and other advanced DAX patterns. See `evaluation/run_evaluation.py` for details.
 
 ---
 

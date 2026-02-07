@@ -102,11 +102,13 @@ DIVIDE(
 )
 ```
 
-Our DAX parser recognizes:
-- **Aggregations**: SUM, AVERAGE, COUNT, SUMX — transformed into calculation rules
+Our DAX **subset** parser uses regex to recognise four pattern families (not the full DAX grammar):
 - **Conditional logic**: IF, SWITCH, CALCULATE with filters — transformed into business rules
-- **Time Intelligence**: SAMEPERIODLASTYEAR, DATEADD — marked as temporal metrics
-- **Dependencies**: Which tables and columns each measure uses
+- **Simple thresholds**: `field > value` comparisons — transformed into threshold rules
+- **Aggregations**: SUM, AVERAGE, COUNT — dependency tracking (not parsed into rules)
+- **Dependencies**: Which tables and columns each measure references
+
+**Not supported**: nested CALCULATE (inner level), VAR/RETURN blocks, row-context iterators (SUMX, FILTER), table constructors, time-intelligence functions (SAMEPERIODLASTYEAR, DATEADD), SELECTEDVALUE, HASONEVALUE.
 
 This is critically important: an AI agent that knows the Revenue formula won't sum the `Price` column directly — it will use the correct metric.
 
@@ -331,7 +333,7 @@ We evaluate extraction accuracy on **real Microsoft .pbix samples**, comparing e
 | Sales_Returns_Sample | 100% | 100% | 100% | 9 |
 | Adventure_Works_DW_2020 | 100% | 100% | 100% | 13 |
 
-### DAX Parser Pattern Coverage
+### DAX Subset Parser — Pattern Coverage
 
 **8/8 patterns** handled correctly (100%). The regex-based parser handles: `CALCULATE`, `IF`, `SWITCH`, and simple thresholds. Patterns without conditions (plain SUM, SUMX iterators) are correctly ignored.
 
