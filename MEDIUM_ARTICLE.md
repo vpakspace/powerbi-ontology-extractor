@@ -4,9 +4,11 @@
 
 ---
 
-## The Problem: $4.6M Lost Due to a Renamed Column
+## The Problem: Schema Drift Can Cost Millions
 
-In 2024, a major logistics company lost $4.6M overnight. The cause was absurdly simple: a database administrator renamed a column from `Warehouse_Location` to `FacilityID`. The AI agent managing routing didn't know about the rename and started shipping cargo to random addresses.
+> **Illustrative estimate.** The $4.6M figure below is a modeled scenario, not a verified incident. Calculation: ~15,000 misrouted shipments x $300 avg rerouting cost = $4.5M + operational downtime. Real-world impact depends on industry, data volume, and detection speed.
+
+Consider a logistics company where a database administrator renames a column from `Warehouse_Location` to `FacilityID`. An AI agent managing routing doesn't know about the rename and starts shipping cargo to random addresses. In a modeled scenario with 15,000 daily shipments, this can accumulate to $4.6M in losses before the error is detected.
 
 This case isn't an exception — it's a symptom of a systemic problem. There are **over 20 million** Power BI dashboards worldwide (Microsoft, 2024). Each one contains a semantic model — tables, relationships, measures, security rules. In essence, every Power BI dashboard is an **informal ontology**, locked inside a proprietary .pbix file.
 
@@ -164,7 +166,7 @@ Power BI is a tool for humans. OWL is a standard for machines. Our extractor is 
 
 ### 4. Schema Drift Detection
 
-Remember the $4.6M story? We solve this problem with Schema Drift Detection:
+Remember the schema drift scenario above? We solve this problem with Schema Drift Detection:
 
 ```python
 from powerbi_ontology import SchemaMapper

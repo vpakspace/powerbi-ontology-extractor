@@ -25,7 +25,7 @@ Enterprises have **20+ million Power BI semantic models** that are actually **in
 
 - **The Challenge**: Each Power BI model contains entities, relationships, and business logic—but AI agents can't access this semantic intelligence
 - **The Cost**: Enterprises spend $50K-$200K per semantic definition to reconcile conflicts across dashboards
-- **The $4.6M Mistake**: A logistics company lost $4.6M when an AI agent used a renamed column (`Warehouse_Location` → `FacilityID`) because there was no semantic binding validation
+- **Schema Drift Risk**: A modeled scenario shows $4.6M in potential losses when an AI agent uses a renamed column (`Warehouse_Location` → `FacilityID`) without semantic binding validation (illustrative estimate: 15K misrouted shipments x $300 rerouting cost)
 
 ## 💡 The Solution
 
@@ -150,7 +150,7 @@ streamlit run ontology_editor.py --server.port 8503
 | **JSON** | Universal agent connector |
 | **Semantic Contract** | Role-based AI agent permissions |
 
-### 5. Schema Drift Detection (Prevents $4.6M Mistakes!)
+### 5. Schema Drift Detection
 - ✅ Validates schema bindings
 - ✅ Detects column renames/deletions
 - ✅ Type normalization (varchar→text, int→integer)
