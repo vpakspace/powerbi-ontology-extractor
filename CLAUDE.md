@@ -1,6 +1,6 @@
 # PowerBI Ontology Extractor
 
-**Миссия**: Извлечь скрытые онтологии из 20+ миллионов Power BI дашбордов и сделать их доступными для AI-агентов.
+**Миссия**: Извлечь скрытые онтологии из миллионов Power BI дашбордов и сделать их доступными для AI-агентов.
 
 **PyPI**: https://pypi.org/project/powerbi-ontology-extractor/ (v0.1.1)
 **GitHub**: https://github.com/vpakspace/powerbi-ontology-extractor
@@ -12,7 +12,7 @@
 ## Видение проекта
 
 ### Проблема
-- 20+ миллионов Power BI дашбордов содержат **скрытые семантические модели** (таблицы, связи, меры, RLS)
+- Миллионы Power BI дашбордов содержат **скрытые семантические модели** (таблицы, связи, меры, RLS)
 - AI-агенты не могут безопасно работать с данными без понимания бизнес-правил
 - **70% онтологии** можно извлечь автоматически из .pbix файлов
 - **30%** требуют добавления бизнес-аналитиком (governance rules, constraints)
@@ -35,7 +35,7 @@ Power BI (.pbix) → Ontology Extractor → OntoGuard → Universal Agent Connec
 ```
 ┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────────────────┐
 │   Power BI .pbix    │────▶│  Ontology Extractor  │────▶│       OntoGuard             │
-│  (20M+ dashboards)  │     │  (этот проект)       │     │  ~/ontoguard-ai/            │
+│ (millions of models) │     │  (этот проект)       │     │  ~/ontoguard-ai/            │
 └─────────────────────┘     └──────────────────────┘     └─────────────────────────────┘
                                      │                              │
                                      │ OWL/Fabric IQ                │ Semantic Validation

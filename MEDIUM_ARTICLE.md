@@ -1,4 +1,4 @@
-# How We Extract Hidden Ontologies from 20 Million Power BI Dashboards and Make Them Accessible to AI Agents
+# How We Extract Hidden Ontologies from Millions of Power BI Dashboards and Make Them Accessible to AI Agents
 
 > **TL;DR**: We built an open-source tool that automatically extracts semantic models from Power BI .pbix files and transforms them into formal OWL ontologies. This enables AI agents to work safely with enterprise data by understanding business rules, relationships, and access constraints. `pip install powerbi-ontology-extractor` — and in 10 minutes you have an ontology.
 
@@ -10,7 +10,7 @@
 
 Consider a logistics company where a database administrator renames a column from `Warehouse_Location` to `FacilityID`. An AI agent managing routing doesn't know about the rename and starts shipping cargo to random addresses. In a modeled scenario with 15,000 daily shipments, this can accumulate to $4.6M in losses before the error is detected.
 
-This case isn't an exception — it's a symptom of a systemic problem. There are **over 20 million** Power BI dashboards worldwide (Microsoft, 2024). Each one contains a semantic model — tables, relationships, measures, security rules. In essence, every Power BI dashboard is an **informal ontology**, locked inside a proprietary .pbix file.
+This case isn't an exception — it's a symptom of a systemic problem. There are **millions of** Power BI dashboards worldwide. Each one contains a semantic model — tables, relationships, measures, security rules. In essence, every Power BI dashboard is an **informal ontology**, locked inside a proprietary .pbix file.
 
 AI agents can't read .pbix files. They don't know that `Revenue` in the sales department and `Revenue` in finance are different metrics with different formulas. They don't understand that an analyst has read-only access, while only an admin can delete records. Without this knowledge, an AI agent is a blind robot with access to a production database.
 
@@ -18,7 +18,7 @@ AI agents can't read .pbix files. They don't know that `Revenue` in the sales de
 
 | Metric | Value |
 |--------|-------|
-| Power BI dashboards worldwide | 20M+ |
+| Power BI dashboards worldwide | Millions |
 | Average cost of manual ontology creation | $50K–$200K |
 | Percentage of ontology that can be extracted automatically | ~70% |
 | Percentage requiring manual work by a business analyst | ~30% |

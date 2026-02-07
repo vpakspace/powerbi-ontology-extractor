@@ -4,7 +4,7 @@
 
 ![PowerBI Ontology Extractor](https://img.shields.io/badge/PowerBI-Ontology%20Extractor-blue?style=for-the-badge)
 
-**Transform 20 million Power BI dashboards into AI-ready ontologies**
+**Transform millions of Power BI dashboards into AI-ready ontologies**
 
 [![Tests](https://img.shields.io/badge/tests-370%20passed-brightgreen)](https://github.com/vpakspace/powerbi-ontology-extractor)
 [![Coverage](https://img.shields.io/badge/coverage-81%25-green)](https://github.com/vpakspace/powerbi-ontology-extractor)
@@ -21,7 +21,7 @@
 
 ## 🎯 The Problem
 
-Enterprises have **20+ million Power BI semantic models** that are actually **informal ontologies** trapped in proprietary .pbix files.
+Enterprises have **millions of Power BI semantic models** that are actually **informal ontologies** trapped in proprietary .pbix files.
 
 - **The Challenge**: Each Power BI model contains entities, relationships, and business logic—but AI agents can't access this semantic intelligence
 - **The Cost**: Enterprises spend $50K-$200K per semantic definition to reconcile conflicts across dashboards
@@ -34,7 +34,7 @@ PowerBI Ontology Extractor **unlocks the hidden ontologies** in your Power BI da
 ```
 ┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────────────────┐
 │   Power BI .pbix    │────▶│  Ontology Extractor  │────▶│       OntoGuard             │
-│  (20M+ dashboards)  │     │  (this project)      │     │  Semantic Firewall          │
+│ (millions of models) │     │  (this project)      │     │  Semantic Firewall          │
 └─────────────────────┘     └──────────────────────┘     └─────────────────────────────┘
                                      │                              │
                                      │ OWL/Fabric IQ                │ Semantic Validation

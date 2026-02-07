@@ -5,7 +5,7 @@ This document tracks the GitHub repository configuration for PowerBI Ontology Ex
 ## ✅ Completed Settings
 
 ### Repository Basics
-- [x] **Repository description**: Set to "Transform 20 million Power BI dashboards into AI-ready ontologies"
+- [x] **Repository description**: Set to "Transform millions of Power BI dashboards into AI-ready ontologies"
 - [x] **Topics/Tags**: Added relevant topics
   - `python`
   - `ontology`

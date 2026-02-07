@@ -10,7 +10,7 @@ This example demonstrates analyzing multiple Power BI dashboards to:
 6. Suggest canonical definition
 7. Generate consolidation report
 
-This demonstrates the "20 million dashboards with conflicting definitions" problem.
+This demonstrates the "millions of dashboards with conflicting definitions" problem.
 """
 
 import sys

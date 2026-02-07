@@ -6,7 +6,7 @@ Follow these steps to publish PowerBI Ontology Extractor to your GitHub account:
 
 1. Go to: **https://github.com/new**
 2. **Repository name**: `powerbi-ontology-extractor`
-3. **Description**: `Transform 20 million Power BI dashboards into AI-ready ontologies`
+3. **Description**: `Transform millions of Power BI dashboards into AI-ready ontologies`
 4. **Visibility**: Public
 5. **Do NOT** check "Add a README file" (you already have one)
 6. Click **Create repository**
