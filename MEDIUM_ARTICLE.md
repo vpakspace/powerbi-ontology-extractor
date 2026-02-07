@@ -139,7 +139,7 @@ The OWL file contains:
 - **owl:DatatypeProperty** for each property with XSD types
 - **owl:ObjectProperty** for relationships between entities
 - **Action Rules** — who (role) can do what (create/read/update/delete) with which entity
-- **SWRL rules** from DAX measures
+- **Business rules** from DAX measures (as OWL annotations)
 - **Constraints** (required, unique, range, enum)
 
 For Sales_Returns_Sample, this generates **1,734 RDF triples** — a complete formal description of the dashboard's semantics.

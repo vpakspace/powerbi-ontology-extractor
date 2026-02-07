@@ -139,7 +139,7 @@ OWL-файл содержит:
 - **owl:DatatypeProperty** для каждого свойства с типами XSD
 - **owl:ObjectProperty** для связей между сущностями
 - **Action Rules** — кто (роль) что (create/read/update/delete) может делать с какой сущностью
-- **SWRL-правила** из DAX-мер
+- **Бизнес-правила** из DAX-мер (в формате OWL-аннотаций)
 - **Ограничения** (required, unique, range, enum)
 
 Для Sales_Returns_Sample это генерирует **1,734 RDF-триплета** — полное формальное описание семантики дашборда.
