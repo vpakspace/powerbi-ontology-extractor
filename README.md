@@ -382,6 +382,14 @@ python evaluation/run_evaluation.py
 
 The regex-based DAX **subset** parser handles 4 core patterns. **Not supported**: nested CALCULATE (inner level), row context (SUMX/FILTER iterators), table constructors, SELECTEDVALUE, HASONEVALUE, and other advanced DAX patterns. See `evaluation/run_evaluation.py` for details.
 
+### Known Limitations
+
+| Limitation | Details |
+|-----------|---------|
+| **Live/DirectQuery** | Only **Import-mode** .pbix files are supported. Live/DirectQuery files do not contain an embedded DataModel and will produce empty/incomplete results. |
+| **DAX parser** | Regex-based subset — 4 patterns only (see above). |
+| **PBIXRay dependency** | Binary DataModel parsing requires `pbixray>=0.5.0`. Without it, only legacy JSON `model.bim` is read. |
+
 ---
 
 ## 📁 Project Structure

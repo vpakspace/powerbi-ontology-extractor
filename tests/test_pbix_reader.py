@@ -54,7 +54,7 @@ class TestPBIXReader:
     def test_read_model_missing_file(self, missing_model_pbix_path):
         """Test reading model when model.bim is missing."""
         reader = PBIXReader(str(missing_model_pbix_path))
-        with pytest.raises(FileNotFoundError, match="model.bim not found"):
+        with pytest.raises(FileNotFoundError, match="No DataModel found"):
             reader.read_model()
     
     def test_get_tables(self, sample_pbix_path):

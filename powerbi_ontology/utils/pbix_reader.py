@@ -85,7 +85,12 @@ class PBIXReader:
                 self._use_pbixray = True
                 logger.info(f"Using PBIXRay for {self.pbix_path}")
             except Exception as e:
-                logger.warning(f"PBIXRay failed, falling back to JSON: {e}")
+                logger.warning(
+                    f"PBIXRay failed for {self.pbix_path.name}: {e}. "
+                    "This may indicate a Live/DirectQuery .pbix file, which "
+                    "does not contain an embedded DataModel. Only Import-mode "
+                    ".pbix files are fully supported. Falling back to JSON."
+                )
                 self._use_pbixray = False
 
         # Extract to temp for fallback/additional data
@@ -155,7 +160,9 @@ class PBIXReader:
                 model_path = bim_files[0]
             else:
                 raise FileNotFoundError(
-                    f"model.bim not found and PBIXRay not available for: {self.pbix_path}"
+                    f"No DataModel found in {self.pbix_path}. "
+                    "This may be a Live/DirectQuery .pbix file — only "
+                    "Import-mode files contain an embedded data model."
                 )
 
         try:
