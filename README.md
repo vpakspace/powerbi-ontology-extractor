@@ -332,6 +332,58 @@ pytest tests/test_owl_exporter.py -v
 
 ---
 
+## 📊 Evaluation
+
+We evaluate extraction accuracy on **real Microsoft .pbix samples** (Sales_Returns_Sample, Adventure_Works_DW_2020), comparing extracted data against manually verified ground truth.
+
+Run the evaluation:
+
+```bash
+python evaluation/run_evaluation.py
+```
+
+### Entity Extraction Accuracy
+
+| Dataset | Precision | Recall | F1 | Entities |
+|---------|-----------|--------|----|----------|
+| Sales_Returns_Sample | 87% | 87% | 87% | 15 |
+| Adventure_Works_DW_2020 | 100% | 100% | 100% | 11 |
+
+### Relationship Extraction
+
+| Dataset | Precision | Recall | F1 | Relationships |
+|---------|-----------|--------|----|---------------|
+| Sales_Returns_Sample | 100% | 100% | 100% | 9 |
+| Adventure_Works_DW_2020 | 100% | 100% | 100% | 13 |
+
+### DAX Parser Pattern Coverage
+
+**8/8** patterns handled correctly (100%):
+
+| Pattern | Status | Notes |
+|---------|--------|-------|
+| `CALCULATE(expr, filter)` | PASS | Single-level only |
+| `IF(condition, true, false)` | PASS | |
+| `SWITCH(TRUE(), ...)` | PASS | |
+| Simple thresholds (`field > value`) | PASS | |
+| Nested CALCULATE | PASS | Outer level captured |
+| VAR/RETURN with IF | PASS | IF inside captured |
+| SUMX (iterator) | PASS | Correctly ignored (no condition) |
+| Plain SUM | PASS | Correctly ignored (aggregation only) |
+
+### OWL Export
+
+| Dataset | OWL Triples | Business Rules | Extraction Time |
+|---------|-------------|----------------|-----------------|
+| Sales_Returns_Sample | 1,656 | 32 | 117 ms |
+| Adventure_Works_DW_2020 | 1,083 | 0 | 73 ms |
+
+### DAX Parser Limitations (documented)
+
+The regex-based DAX parser handles 4 core patterns. **Not supported**: nested CALCULATE (inner level), row context (SUMX/FILTER iterators), table constructors, SELECTEDVALUE, HASONEVALUE, and other advanced DAX patterns. See `evaluation/run_evaluation.py` for details.
+
+---
+
 ## 📁 Project Structure
 
 ```

@@ -313,6 +313,39 @@ Together they implement a **semantic contract**: the AI agent gets not just data
 
 ---
 
+## Evaluation
+
+We evaluate extraction accuracy on **real Microsoft .pbix samples**, comparing extracted data against manually verified ground truth.
+
+### Entity Extraction Accuracy
+
+| Dataset | Precision | Recall | F1 | Entities |
+|---------|-----------|--------|----|----------|
+| Sales_Returns_Sample | 87% | 87% | 87% | 15 |
+| Adventure_Works_DW_2020 | 100% | 100% | 100% | 11 |
+
+### Relationship Extraction
+
+| Dataset | Precision | Recall | F1 | Relationships |
+|---------|-----------|--------|----|---------------|
+| Sales_Returns_Sample | 100% | 100% | 100% | 9 |
+| Adventure_Works_DW_2020 | 100% | 100% | 100% | 13 |
+
+### DAX Parser Pattern Coverage
+
+**8/8 patterns** handled correctly (100%). The regex-based parser handles: `CALCULATE`, `IF`, `SWITCH`, and simple thresholds. Patterns without conditions (plain SUM, SUMX iterators) are correctly ignored.
+
+### OWL Export
+
+| Dataset | OWL Triples | Business Rules | Extraction Time |
+|---------|-------------|----------------|-----------------|
+| Sales_Returns_Sample | 1,656 | 32 | 117 ms |
+| Adventure_Works_DW_2020 | 1,083 | 0 | 73 ms |
+
+**Limitations**: The regex-based DAX parser does not support nested CALCULATE (inner level), row context iterators (SUMX/FILTER), table constructors, or advanced DAX patterns like SELECTEDVALUE/HASONEVALUE. The evaluation script and ground truth data are available in `evaluation/run_evaluation.py`.
+
+---
+
 ## Testing and Security
 
 ### 370 Tests, 81% Coverage
